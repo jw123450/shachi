@@ -31,16 +31,11 @@ public class TurretTest extends OpMode {
 
     private volatile boolean blueAlliance = true;
 
-    final Gamepad currentGamepad1 = new Gamepad();
-    final Gamepad currentGamepad2 = new Gamepad();
-    final Gamepad previousGamepad1 = new Gamepad();
-    final Gamepad previousGamepad2 = new Gamepad();
-
     @Override
     public void init() {
         robotHardware.initialize(this);
         drive.initialize(this, robotHardware);
-        turret.initialize(this, robotHardware, false);
+        turret.initialize(this, robotHardware);
         pinpoint.initialize(this, robotHardware);
 
         // loop time stuff
@@ -75,18 +70,13 @@ public class TurretTest extends OpMode {
     public void loop() {
         for (LynxModule hub : allHubs) { hub.clearBulkCache(); }
         TelemetryPacket packet = new TelemetryPacket();
-        previousGamepad1.copy(currentGamepad1);
-        previousGamepad2.copy(currentGamepad2);
-        currentGamepad1.copy(gamepad1);
-        currentGamepad2.copy(gamepad2);
+
 
         pinpoint.operateSimple();
         turret.operateTesting(packet, pinpoint.normalizedHeading);
         drive.operateSimple();
 
         dash.sendTelemetryPacket(packet);
-        telemetry.addLine("B for RED | X for BLUE");
-        telemetry.addLine(blueAlliance ? "BLUE ALLIANCE" : "RED ALLIANCE");
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
 

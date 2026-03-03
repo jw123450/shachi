@@ -17,7 +17,7 @@
 //import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 //import org.firstinspires.ftc.teamcode.Util.LimelightVision;
 //import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
-//import org.firstinspires.ftc.teamcode.Subsystem.ShooterV2;
+//import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 //import org.firstinspires.ftc.teamcode.Subsystem.Turret;
 //import org.firstinspires.ftc.teamcode.Util.Globals;
 //import org.firstinspires.ftc.teamcode.Util.PinpointManager;
@@ -40,7 +40,7 @@
 //    private Turret turret = new Turret();
 //    private MecanumDrive drive = new MecanumDrive();
 //    private LimelightVision llVision = new LimelightVision();
-//    private ShooterV2 shooter = new ShooterV2();
+//    private Shooter shooter = new Shooter();
 //    private PinpointManager pinpoint = new PinpointManager();
 //    private RGBLights lights = new RGBLights();
 //

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystem.ShooterV2;
+import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
 @TeleOp(name = "Flywheel V2 Tuning", group = "Testing")
 public class TuningFlywheelV2 extends OpMode{
 
-    private ShooterV2 shooter = new ShooterV2();
+    private Shooter shooter = new Shooter();
     RobotHardware robotHardware = new RobotHardware();
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
