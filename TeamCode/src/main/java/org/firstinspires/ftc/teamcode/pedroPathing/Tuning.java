@@ -207,7 +207,7 @@ class ForwardTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("Distance Moved: " + follower.getPose().getX());
+        telemetryM.debug("Distance Moved: " + (follower.getPose().getX() - 72));
         telemetryM.debug("The multiplier will display what your forward ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
         telemetryM.debug("Multiplier: " + (DISTANCE / ((follower.getPose().getX() - 72) / follower.getPoseTracker().getLocalizer().getForwardMultiplier())));
         telemetryM.update(telemetry);
@@ -255,7 +255,7 @@ class LateralTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("Distance Moved: " + follower.getPose().getY());
+        telemetryM.debug("Distance Moved: " + (follower.getPose().getY() - 72));
         telemetryM.debug("The multiplier will display what your strafe ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
         telemetryM.debug("Multiplier: " + (DISTANCE / ((follower.getPose().getY() - 72) / follower.getPoseTracker().getLocalizer().getLateralMultiplier())));
         telemetryM.update(telemetry);
@@ -1013,11 +1013,6 @@ class Line extends OpMode {
         }
 
         telemetryM.debug("Driving Forward?: " + forward);
-        telemetryM.addData("Zero Line", 0);
-        telemetryM.addData("Error X", follower.errorCalculator.getTranslationalError().getXComponent());
-        telemetryM.addData("Error Y", follower.errorCalculator.getTranslationalError().getYComponent());
-        telemetryM.addData("Error Heading", follower.errorCalculator.getHeadingError());
-        telemetryM.addData("Error Drive", follower.errorCalculator.getDriveErrors()[1]);
         telemetryM.update(telemetry);
     }
 }
@@ -1036,9 +1031,8 @@ class Line extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class CentripetalTuner extends OpMode {
-    public static double DISTANCE = 30;
+    public static double DISTANCE = 20;
     private boolean forward = true;
-    private Timer timer = new Timer();
 
     private Path forwards;
     private Path backwards;
@@ -1046,7 +1040,6 @@ class CentripetalTuner extends OpMode {
     @Override
     public void init() {
         follower.setStartingPose(new Pose(72, 72));
-        timer.resetTimer();
     }
 
     /**
@@ -1073,7 +1066,6 @@ class CentripetalTuner extends OpMode {
         backwards.reverseHeadingInterpolation();
 
         follower.followPath(forwards);
-        timer.resetTimer();
     }
 
     /**
@@ -1095,16 +1087,6 @@ class CentripetalTuner extends OpMode {
         }
 
         telemetryM.debug("Driving away from the origin along the curve?: " + forward);
-        telemetryM.addData("Zero Line", 0);
-        telemetryM.addData("Error X", follower.errorCalculator.getTranslationalError().getXComponent());
-        telemetryM.addData("Error Y", follower.errorCalculator.getTranslationalError().getYComponent());
-        telemetryM.addData("Error Heading", follower.errorCalculator.getHeadingError());
-        telemetryM.addData("Error Drive", follower.errorCalculator.getDriveErrors()[1]);
-
-        telemetryM.addData("Heading (degrees)", Math.toDegrees(follower.getHeading()));
-        telemetryM.addData("Looptimes ", timer.getElapsedTime());
-
-        timer.resetTimer();
         telemetryM.update(telemetry);
     }
 }
@@ -1183,7 +1165,7 @@ class Triangle extends OpMode {
  * @version 1.0, 3/12/2024
  */
 class Circle extends OpMode {
-    public static double RADIUS = 20;
+    public static double RADIUS = 10;
     private PathChain circle;
 
     public void start() {
@@ -1227,13 +1209,6 @@ class Circle extends OpMode {
         if (follower.atParametricEnd()) {
             follower.followPath(circle);
         }
-
-        telemetryM.addData("Zero Line", 0);
-        telemetryM.addData("Error X", follower.errorCalculator.getTranslationalError().getXComponent());
-        telemetryM.addData("Error Y", follower.errorCalculator.getTranslationalError().getYComponent());
-        telemetryM.addData("Error Heading", follower.errorCalculator.getHeadingError());
-        telemetryM.addData("Error Drive", follower.errorCalculator.getDriveErrors()[1]);
-        telemetryM.update(telemetry);
     }
 }
 
