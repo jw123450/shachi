@@ -36,8 +36,8 @@ public class Turret {
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
-//        this.leftServo = robotHardware.leftTurretServo;
-//        this.rightServo = robotHardware.rightTurretServo;
+        this.leftServo = robotHardware.leftTurretServo;
+        this.rightServo = robotHardware.rightTurretServo;
         leftServoEnc = new AbsoluteAnalogEncoder(opmode, robotHardware);
     }
 

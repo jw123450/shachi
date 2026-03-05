@@ -47,8 +47,8 @@ public class Intake {
         this.opmode = opmode;
         intakeMotor = robotHardware.intakeMotor;
         transferMotor = robotHardware.transferMotor;
-        leftIntakeArm = robotHardware.leftIntakeArm;
-        rightIntakeArm = robotHardware.rightIntakeArm; /// add BRAKE MODE
+        leftIntakeArm = robotHardware.leftIntakeServo;
+        rightIntakeArm = robotHardware.rightIntakeServo; /// add BRAKE MODE
         rightIntakeArm.setDirection(Servo.Direction.REVERSE);
         transferMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -172,11 +172,11 @@ public class Intake {
 
     }
 
-    private double limitPower(double powerCmd, double pulledCurrent) {
-        if (pulledCurrent > CURRENT_LIMIT) {
-            double scale = CURRENT_LIMIT / pulledCurrent;
-            powerCmd *= scale;
-        }
-        return powerCmd;
-    }
+//    private double limitPower(double powerCmd, double pulledCurrent) {
+//        if (pulledCurrent > CURRENT_LIMIT) {
+//            double scale = CURRENT_LIMIT / pulledCurrent;
+//            powerCmd *= scale;
+//        }
+//        return powerCmd;
+//    }
 }

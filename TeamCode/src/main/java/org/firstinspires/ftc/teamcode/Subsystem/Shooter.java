@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -14,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 @Config
 public class Shooter {
     OpMode opmode;
-    DcMotorEx S1, S2;
-    Servo shooterLatch, hoodAngleAdjust;
+    DcMotorEx ShooterR, ShooterL;
+    Servo hoodAngleAdjust;
 
     // RPM targets
     public static double FAR_RPM = 3100;
@@ -37,12 +38,12 @@ public class Shooter {
     public static double kS = 0;
 
     // hood angle adjust
-    public static double HOOD_ANGLE_MAX_POS = 0.5167; // servo pos 0-1
-    public static double HOOD_ANGLE_MIN_POS = 0.99;
-    public static double TEMP_LAUNCH_ANGLE = 40;
+    public static double HOOD_ANGLE_MAX_POS = 0000; // servo pos 0-1
+    public static double HOOD_ANGLE_MIN_POS = 0000;
+    public static double TEMP_LAUNCH_ANGLE = 50;
     public static double TEMP_RPM = 0;
-    public static double MAX_ANGLE_DEG = 55; // degrees above horizontal
-    public static double MIN_ANGLE_DEG = 40;
+    public static double MAX_ANGLE_DEG = 75; // degrees above horizontal
+    public static double MIN_ANGLE_DEG = 25;
 
     // servo latch
     public static double TUNING_INCREMENT = 0.001;
@@ -70,13 +71,13 @@ public class Shooter {
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
-        this.S1 = robotHardware.S1;
-        this.S2 = robotHardware.S2;
-        this.shooterLatch = robotHardware.shooterLatch;
+        this.ShooterR = robotHardware.ShooterR;
+        this.ShooterL = robotHardware.ShooterL;
         this.hoodAngleAdjust = robotHardware.hoodAngleAdjust;
 
-        S1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        S1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        ShooterL.setDirection(DcMotorSimple.Direction.REVERSE);
+        ShooterR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        ShooterR.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void operateOdomTracking(double currentX, double currentY, boolean blueAlliance, boolean vinWantsToShoot, boolean cyclingFarZone) {
@@ -107,15 +108,15 @@ public class Shooter {
             targetRPM = 0;
         }
 
-        S1.setPower(output);
-        S2.setPower(output);
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
 
         atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
 
 //        opmode.telemetry.addData("x_dist", x_dist);
 //        opmode.telemetry.addData("y_dist", y_dist);
-//        opmode.telemetry.addData("S1 amps pulled: ", S1.getCurrent(CurrentUnit.AMPS));
-//        opmode.telemetry.addData("S2 amps pulled: ", S2.getCurrent(CurrentUnit.AMPS));
+//        opmode.telemetry.addData("ShooterR amps pulled: ", ShooterR.getCurrent(CurrentUnit.AMPS));
+//        opmode.telemetry.addData("ShooterL amps pulled: ", ShooterL.getCurrent(CurrentUnit.AMPS));
         opmode.telemetry.addLine("\nSHOOTER");
         opmode.telemetry.addData("dist", dist);
         opmode.telemetry.addData("shooter targetRPM", targetRPM);
@@ -146,8 +147,8 @@ public class Shooter {
             targetRPM = 0;
         }
 
-        S1.setPower(output);
-        S2.setPower(output);
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
 
         atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
 
@@ -183,13 +184,13 @@ public class Shooter {
             targetRPM = 0;
         }
 
-        S1.setPower(output);
-        S2.setPower(output);
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
 
         atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
 
-//        opmode.telemetry.addData("S1 amps pulled: ", S1.getCurrent(CurrentUnit.AMPS));
-//        opmode.telemetry.addData("S2 amps pulled: ", S2.getCurrent(CurrentUnit.AMPS));
+//        opmode.telemetry.addData("ShooterR amps pulled: ", ShooterR.getCurrent(CurrentUnit.AMPS));
+//        opmode.telemetry.addData("ShooterL amps pulled: ", ShooterL.getCurrent(CurrentUnit.AMPS));
         opmode.telemetry.addLine("\nSHOOTER");
         opmode.telemetry.addData("dist", dist);
         opmode.telemetry.addData("shooter targetRPM", targetRPM);
@@ -214,8 +215,8 @@ public class Shooter {
 
         output = update(currentRPM);
 
-        S1.setPower(output);
-        S2.setPower(output);
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
 
         atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
 
@@ -228,16 +229,15 @@ public class Shooter {
     }
 
     public void operateTuning(TelemetryPacket packet) {
-//        pidfController.setPIDF(kP, kI, kD, kV);
         double currentRPM = getCurrentRPM();
 
         if (opmode.gamepad1.left_trigger > 0.2) {
             output = update(currentRPM);
-            S1.setPower(output);
-            S2.setPower(output);
-        } else if (S1.getPower() > 0.02) {
-            S1.setPower(0);
-            S2.setPower(0);
+            ShooterR.setPower(output);
+            ShooterL.setPower(output);
+        } else if (Math.abs(ShooterR.getPower()) > 0.02) {
+            ShooterR.setPower(0);
+            ShooterL.setPower(0);
         }
 
 //        if (opmode.gamepad1.dpad_up)        { targetRPM = FAR_RPM; }
@@ -249,30 +249,22 @@ public class Shooter {
         atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
 
         // graphing
-        packet.put("power", S1.getPower());
+        packet.put("power", ShooterR.getPower());
         packet.put("output", output);
-        packet.put("current (amps)", S1.getCurrent(CurrentUnit.AMPS));
+        packet.put("current (amps)", ShooterR.getCurrent(CurrentUnit.AMPS));
         packet.put("currentRPM", currentRPM);
         packet.put("targetRPM", targetRPM);
 
-        // latch
-        if (opmode.gamepad1.y) {
-            incremental(shooterLatch, 1);
-        } else if (opmode.gamepad1.a) {
-            incremental(shooterLatch, -1);
-        }
-
         // hood adjust
-//        if (opmode.gamepad1.b) {
+        if (opmode.gamepad1.b) {
 //            hoodAngleAdjust.setPosition(HOOD_ANGLE_MAX_POS);
-////            incremental(hoodAngleAdjust, 1);
-//        } else if (opmode.gamepad1.x) {
+            incremental(hoodAngleAdjust, 1);
+        } else if (opmode.gamepad1.x) {
 //            hoodAngleAdjust.setPosition(HOOD_ANGLE_MIN_POS);
-////            incremental(hoodAngleAdjust, -1);
-//        }
-        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
+            incremental(hoodAngleAdjust, -1);
+        }
+//        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
 
-        opmode.telemetry.addData("servo latch pos: ", shooterLatch.getPosition());
         opmode.telemetry.addData("hood adjust pos: ", hoodAngleAdjust.getPosition());
         opmode.telemetry.addData("TEMP_LAUNCH_ANGLE", TEMP_LAUNCH_ANGLE);
         opmode.telemetry.addData("TEMP_RPM", TEMP_RPM);
@@ -285,12 +277,12 @@ public class Shooter {
 
     public void operateFindMaxRPM() {
         double power = -opmode.gamepad1.left_stick_y;
-        S1.setPower(power);
-        S2.setPower(power);
+        ShooterR.setPower(power);
+        ShooterL.setPower(power);
 
         opmode.telemetry.addData("GP1 left stick Y: ", power);
-        opmode.telemetry.addData("Current RPM     : ", ticksPerSecToRPM(S1.getVelocity()));
-        opmode.telemetry.addData("Amps pulled     : ", S1.getCurrent(CurrentUnit.AMPS));
+        opmode.telemetry.addData("Current RPM     : ", ticksPerSecToRPM(ShooterR.getVelocity()));
+        opmode.telemetry.addData("Amps pulled     : ", ShooterR.getCurrent(CurrentUnit.AMPS));
     }
 
     public double update(double currentRPM) {
@@ -325,18 +317,8 @@ public class Shooter {
         s.setPosition(s.getPosition() + sign * TUNING_INCREMENT);
     }
 
-    public void openLatch() {
-        shooterLatch.setPosition(LATCH_OPEN_POS);
-        shooterLatchOpen = true;
-    }
-
-    public void closeLatch() {
-        shooterLatch.setPosition(LATCH_CLOSED_POS);
-        shooterLatchOpen = false;
-    }
-
     public double getCurrentRPM() {
-        return ticksPerSecToRPM(S1.getVelocity());
+        return ticksPerSecToRPM(ShooterR.getVelocity());
     }
 
     public double distanceToRPM(double distance) {

@@ -14,7 +14,7 @@ public class ResetTurretEncoder extends OpMode {
     @Override
     public void init() {
         robotHardware.initialize(this);
-        turret.initialize(this, robotHardware, true);
+        turret.initialize(this, robotHardware);
     }
 
     @Override

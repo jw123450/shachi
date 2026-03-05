@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.Util;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,15 +13,16 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class RobotHardware {
-    public DcMotorEx intakeMotor;
+    public DcMotorEx intakeMotor, transferMotor;
     public DcMotorEx Br, Bl, Fr, Fl;
-    public DcMotorEx S1, S2;
-    public DcMotorEx turretMotor;
+    public DcMotorEx ShooterR, ShooterL;
 
-    public Servo ballPusher;
-    public Servo shooterLatch;
-    public Servo RGBIndicator;
+    public Servo leftTurretServo, rightTurretServo;
+    public Servo leftIntakeServo, rightIntakeServo;
+    public Servo RGBIndicatorL, RGBIndicatorR;
     public Servo hoodAngleAdjust;
+
+    public AnalogInput rightTurretAnalog, transferBreakBeam, intakeBreakBeam;
 
     public VoltageSensor battery;
 
@@ -35,65 +36,79 @@ public class RobotHardware {
         /*
             CONFIG:
 
-            pinpoint - CHUB i2c 1
-            color sensor 0 - CHUB digital #
-            color sensor 1 - CHUB digital #
-            color sensor 2 - CHUB digital #
+            SENSORS
+            pinpoint            - CHUB i2c 1
+            turret analog input - CHUB analog 0
+            break beam transfer - CHUB analog 1
+            break beam intake   - CHUB analog 2
 
             MOTOR
             Bl - EHUB0
             Br - EHUB1
             Fl - EHUB2
             Fr - EHUB3
-            Shooter1 (S1) - CHUB0
-            Shooter2 (S2) - CHUB1
-            turret - CHUB2
-            intake - CHUB3
+            ShooterL - CHUB0
+            ShooterR - CHUB1
+            turret   - CHUB2
+            transfer - CHUB3
 
             SERVO
-            ballPusher - EHUB0
-            shooterLatch - CHUB0
+            leftTurretServo  - SHUB #
+            rightTurretServo - SHUB #
+            hoodAngleAdjust  - SHUB #
+            leftIntakeServo  - EHUB #
+            rightIntakeServo - CHUB #
+            RGB light L      - EHUB 0
+            RGB light R      - CHUB 5
+
          */
         battery = opmode.hardwareMap.voltageSensor.iterator().next();
 
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
+        intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
+        rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 
         limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
-        opmode.telemetry.setMsTransmissionInterval(11);
         limelight.pipelineSwitch(0);
-        //intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
+
+        opmode.telemetry.setMsTransmissionInterval(11);
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "fl");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "fr");
         Bl = opmode.hardwareMap.get(DcMotorEx.class, "bl");
         Br = opmode.hardwareMap.get(DcMotorEx.class, "br");
-        S1 = opmode.hardwareMap.get(DcMotorEx.class, "Shooter1");
-        S2 = opmode.hardwareMap.get(DcMotorEx.class, "Shooter2");
-        turretMotor = opmode.hardwareMap.get(DcMotorEx.class, "Turret");
+        ShooterL = opmode.hardwareMap.get(DcMotorEx.class, "shooterL");
+        ShooterR = opmode.hardwareMap.get(DcMotorEx.class, "shooterR");
+        transferMotor = opmode.hardwareMap.get(DcMotorEx.class, "transfer");
         intakeMotor = opmode.hardwareMap.get(DcMotorEx.class, "intake");
-        ballPusher = opmode.hardwareMap.get(Servo.class, "ballpusher");
-        shooterLatch = opmode.hardwareMap.get(Servo.class, "shooterlatch");
-        RGBIndicator = opmode.hardwareMap.get(Servo.class, "light");
-        hoodAngleAdjust = opmode.hardwareMap.get(Servo.class, "hoodangleadjust");
+
+        leftTurretServo = opmode.hardwareMap.get(Servo.class, "turretL");
+        rightTurretServo = opmode.hardwareMap.get(Servo.class, "turretR");
+        leftIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeL");
+        rightIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeR");
+        hoodAngleAdjust = opmode.hardwareMap.get(Servo.class, "hoodangle");
+
+        RGBIndicatorL = opmode.hardwareMap.get(Servo.class, "lightL");
+        RGBIndicatorR = opmode.hardwareMap.get(Servo.class, "lightR");
 
         Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        S2.setDirection(DcMotorSimple.Direction.REVERSE);
-        S1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        S2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ShooterR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        ShooterL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         Fl.setDirection(DcMotorSimple.Direction.REVERSE);
         Bl.setDirection(DcMotorSimple.Direction.REVERSE);
         Br.setDirection(DcMotorSimple.Direction.FORWARD);
         Fr.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        odo.setOffsets(108.647, 40.032, DistanceUnit.MM);
+        // xOffset is same as pedro ForwardPodY
+        // yOffest is same as pedro StrafePodX
+        odo.setOffsets(-68.538, -132.605, DistanceUnit.MM);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
     }
 }

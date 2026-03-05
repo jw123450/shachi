@@ -15,7 +15,7 @@ public class AbsoluteAnalogEncoder implements HardwareDevice {
 
     public AbsoluteAnalogEncoder(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
-        this.encoder = robotHardware.leftServoAnalogEnc;
+        this.encoder = robotHardware.rightTurretAnalog;
     }
 
     public double getCurrentTurretAngle() {

@@ -51,13 +51,13 @@ public class Constants {
             ;
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(0)
-            .strafePodX(0)
-            .distanceUnit(DistanceUnit.INCH)
+            .forwardPodY(-68.538)
+            .strafePodX(-132.605)
+            .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD) // TODO
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD) // TODO
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             ;
 
     public static PathConstraints pathConstraints = new PathConstraints(0.975, 100, 1.4, 2);

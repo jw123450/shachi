@@ -32,7 +32,7 @@ public class RGBLights {
     public volatile Colors currentColor = Colors.WHITE;
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
-        this.RGBIndicator = robotHardware.RGBIndicator;
+        this.RGBIndicator = robotHardware.RGBIndicatorL;
         this.opmode = opmode;
         // Servo positions from the goBILDA chart https://www.gobilda.com/rgb-indicator-light-pwm-controlled/?srsltid=AfmBOopo3iYNvDaQDFttTQRF6RCs8uUW_0dftYO7PsB9ynAV060EuxIl
         colors.put(Colors.OFF, 0.0);

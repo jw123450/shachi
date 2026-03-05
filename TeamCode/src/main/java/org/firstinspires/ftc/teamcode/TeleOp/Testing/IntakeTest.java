@@ -15,7 +15,6 @@ import java.util.List;
 public class IntakeTest extends OpMode{
     private Intake intake = new Intake();
     private RobotHardware robotHardware = new RobotHardware();
-    private List<LynxModule> allHubs;
 
     @Override
     public void init() {
