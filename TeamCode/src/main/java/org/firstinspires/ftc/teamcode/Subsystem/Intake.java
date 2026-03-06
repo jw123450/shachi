@@ -50,7 +50,7 @@ public class Intake {
         leftIntakeArm = robotHardware.leftIntakeServo;
         rightIntakeArm = robotHardware.rightIntakeServo; /// add BRAKE MODE
         rightIntakeArm.setDirection(Servo.Direction.REVERSE);
-        transferMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void operateTesting() {

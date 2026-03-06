@@ -20,9 +20,9 @@ public class RobotHardware {
     public Servo leftTurretServo, rightTurretServo;
     public Servo leftIntakeServo, rightIntakeServo;
     public Servo RGBIndicatorL, RGBIndicatorR;
-    public Servo hoodAngleAdjust;
+    public Servo hoodAngleAdjust, shooterLatch;
 
-    public AnalogInput rightTurretAnalog, transferBreakBeam, intakeBreakBeam;
+    public AnalogInput rightTurretAnalog, transferBreakBeam,middleBreakBeam, intakeBreakBeam;
 
     public VoltageSensor battery;
 
@@ -38,27 +38,29 @@ public class RobotHardware {
 
             SENSORS
             pinpoint            - CHUB i2c 1
-            turret analog input - CHUB analog 0
-            break beam transfer - CHUB analog 1
-            break beam intake   - CHUB analog 2
+            turret analog input - CHUB analog 4
+            break beam transfer - CHUB analog 0
+            break beam middle   - CHUB analog 2
+            break beam intake   - CHUB analog 1
 
             MOTOR
-            Bl - EHUB0
-            Br - EHUB1
-            Fl - EHUB2
-            Fr - EHUB3
+            Fl - EHUB0
+            Fr - EHUB1
+            Bl - EHUB2
+            Br - EHUB3
             ShooterL - CHUB0
             ShooterR - CHUB1
-            turret   - CHUB2
-            transfer - CHUB3
+            transfer - CHUB2
+            intake   - CHUB3
 
             SERVO
-            leftTurretServo  - SHUB #
-            rightTurretServo - SHUB #
-            hoodAngleAdjust  - SHUB #
-            leftIntakeServo  - EHUB #
-            rightIntakeServo - CHUB #
+            leftTurretServo  - SHUB 3
+            rightTurretServo - SHUB 2
+            hoodAngleAdjust  - SHUB 0
+            shooterLatch     - EIJNDINOIAOIPSANDOPIDANODPSINSIOADNDSOIPNDSAO
+            leftIntakeServo  - EHUB 0
             RGB light L      - EHUB 0
+            rightIntakeServo - CHUB 5
             RGB light R      - CHUB 5
 
          */
@@ -66,13 +68,14 @@ public class RobotHardware {
 
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
+        middleBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "middleBreak");
         intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
         rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 
-        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
-
-        opmode.telemetry.setMsTransmissionInterval(11);
+//        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(0);
+//
+//        opmode.telemetry.setMsTransmissionInterval(11);
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "fl");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "fr");
@@ -88,6 +91,7 @@ public class RobotHardware {
         leftIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeL");
         rightIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeR");
         hoodAngleAdjust = opmode.hardwareMap.get(Servo.class, "hoodangle");
+        //shooterLatch = opmode.hardwareMap.get(Servo.class, "latch");
 
         RGBIndicatorL = opmode.hardwareMap.get(Servo.class, "lightL");
         RGBIndicatorR = opmode.hardwareMap.get(Servo.class, "lightR");
