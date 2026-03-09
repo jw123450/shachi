@@ -27,7 +27,7 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//@TeleOp(name = "Shoot While Move Test", group = "B")
+//@TeleOp(name = "Shoot While Move Test", group = "Testing")
 //public class ShootWhileMoveTest extends OpMode {
 //
 //    private ElapsedTime elapsedtime;

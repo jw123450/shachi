@@ -20,7 +20,7 @@ public class Turret {
     public static double RIGHT_LIMIT = -177.5; // code limit
     public static double AT_TARGET_RANGE = 5; // in degrees
 
-    public static double Kv = 0;
+    public static double Kv = 0; /// TODO later
 
     public static double temp_target = 0;
 
@@ -62,7 +62,7 @@ public class Turret {
         opmode.telemetry.addData("temp_target", temp_target);
     }
 
-    public void operateOdomTracking(double currentX, double currentY, double chassisNormalizedHeading, boolean blueAlliance, boolean vinWantsToShoot) {
+    public void operateBasic(double currentX, double currentY, double chassisNormalizedHeading, boolean blueAlliance, boolean vinWantsToShoot) {
         // calculate TRUE target heading
         double currentAngle = leftServoEnc.getCurrentTurretAngle();
         double x_dist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - currentX;

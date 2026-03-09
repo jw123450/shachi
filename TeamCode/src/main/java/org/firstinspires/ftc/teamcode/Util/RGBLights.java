@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 
 public class RGBLights {
-    public Servo RGBIndicator;
+    public Servo IndicatorL, IndicatorR;
     private OpMode opmode;
     // map from name to corresponding servo position (0.0-1.0)
     private HashMap<Colors, Double> colors = new HashMap<>();
@@ -32,7 +32,8 @@ public class RGBLights {
     public volatile Colors currentColor = Colors.WHITE;
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
-        this.RGBIndicator = robotHardware.RGBIndicatorL;
+        this.IndicatorL = robotHardware.RGBIndicatorL;
+        this.IndicatorR = robotHardware.RGBIndicatorR;
         this.opmode = opmode;
         // Servo positions from the goBILDA chart https://www.gobilda.com/rgb-indicator-light-pwm-controlled/?srsltid=AfmBOopo3iYNvDaQDFttTQRF6RCs8uUW_0dftYO7PsB9ynAV060EuxIl
         colors.put(Colors.OFF, 0.0);
@@ -52,7 +53,8 @@ public class RGBLights {
 
     public void setColor(Colors color) {
         currentColor = color;
-        RGBIndicator.setPosition(colors.get(color));
+        IndicatorL.setPosition(colors.get(color));
+        IndicatorR.setPosition(colors.get(color));
     }
 
     public void operateAuto() {
@@ -63,6 +65,6 @@ public class RGBLights {
 
         // map zigzag (0→1) to pose range (RAINBOW_LOW_ENDPOINT → RAINBOW_HIGH_ENDPOINT)
         double pos = RAINBOW_LOW_ENDPOINT + zigzag * (RAINBOW_HIGH_ENDPOINT - RAINBOW_LOW_ENDPOINT);
-        RGBIndicator.setPosition(pos);
+        IndicatorL.setPosition(pos);
     }
 }

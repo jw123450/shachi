@@ -20,12 +20,13 @@ public class Intake {
         INTAKING,
         INTAKING_FULL_POWER,
         REVERSE,
-        IDLE
+        IDLE,
+        TRANSFERRING
     }
 
     // servo constants
-    public static double INTAKE_STOW = 0;
-    public static double INTAKE_DEPLOY = 0;
+    public static double INTAKE_STOW = 0.5;
+    public static double INTAKE_DEPLOY = 0.5;
     public static double TUNING_INCREMENT = 0.001;
 
     // motor constants
@@ -38,7 +39,8 @@ public class Intake {
     public volatile IntakeState intakeState = IntakeState.IDLE;
     public boolean isArmStowed = true;
     public boolean isTransferring = false;
-    public volatile double targetPower = 0;
+    public volatile double targetIntakePower = 0;
+    public volatile double targetTransferPower = 0;
 //    public volatile boolean motorStalled = false;
 
     public Intake() {}
@@ -49,7 +51,7 @@ public class Intake {
         transferMotor = robotHardware.transferMotor;
         leftIntakeArm = robotHardware.leftIntakeServo;
         rightIntakeArm = robotHardware.rightIntakeServo; /// add BRAKE MODE
-        rightIntakeArm.setDirection(Servo.Direction.REVERSE);
+        rightIntakeArm.setDirection(Servo.Direction.REVERSE); /// maybe left reverse
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -82,19 +84,22 @@ public class Intake {
         opmode.telemetry.addData("intake state enum: ", intakeState);
     }
 
-    public void operateCurrentLimiting() {
-//        double pulledCurrent = intakeMotor.getCurrent(CurrentUnit.AMPS);
-//        double assignedPower = limitPower(targetPower, pulledCurrent);
-        intakeMotor.setPower(targetPower);
-//        motorStalled = pulledCurrent > STALL_WARNING_THRESHOLD;
-
-//        opmode.telemetry.addLine("\nINTAKE");
-//        opmode.telemetry.addData("intake targetPower", targetPower);
-//        opmode.telemetry.addData("intake assignedPower", assignedPower);
-//        opmode.telemetry.addData("intake amps pulled", pulledCurrent);
-//        opmode.telemetry.addData("motorStalled? ", motorStalled);
+    public void operateSimple() {
+        if (opmode.gamepad1.right_trigger > 0.1) {
+            intakeMotor.setPower(opmode.gamepad1.right_trigger);
+            transferMotor.setPower(opmode.gamepad1.right_trigger);
+        } else {
+            intakeMotor.setPower(0);
+            transferMotor.setPower(0);
+        }
     }
 
+    public void operateTeleOp() {
+        intakeMotor.setPower(targetIntakePower);
+        transferMotor.setPower(targetTransferPower);
+    }
+
+    ///  asfadsfsdafadsfasdfasaxfaasdf
 //        if (intake.intakeState == Intake.IntakeState.IDLE) {
 //            if (currentMagState != Spindexer.MagState.FULL) {
 //                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
@@ -135,23 +140,35 @@ public class Intake {
 
     // intake helper methods
     public void setIntake(double power) {
-        targetPower = power;
+        targetIntakePower = power;
+    }
+    public void setTransfer(double power) {
+        targetTransferPower = power;
     }
     public void intakeFullPower() {
         intakeState = IntakeState.INTAKING;
         setIntake(INTAKING_FULL_POWER);
+        setTransfer(INTAKING_FULL_POWER);
     }
     public void intake() {
         intakeState = IntakeState.INTAKING;
         setIntake(INTAKING_POWER);
+        setTransfer(INTAKING_POWER);
     }
     public void reverse() {
         intakeState = IntakeState.REVERSE;
         setIntake(REVERSE_POWER);
+        setTransfer(REVERSE_POWER);
     }
     public void idle() {
         intakeState = IntakeState.IDLE;
         setIntake(IDLE_POWER);
+        setTransfer(IDLE_POWER);
+    }
+    public void runTransferOnly() {
+        intakeState = IntakeState.TRANSFERRING;
+        setIntake(IDLE_POWER);
+        setTransfer(INTAKING_FULL_POWER);
     }
 
     // ball pusher helper methods
@@ -169,7 +186,7 @@ public class Intake {
 
     public void incremental(int sign) {
         leftIntakeArm.setPosition(leftIntakeArm.getPosition() + sign * TUNING_INCREMENT);
-
+        rightIntakeArm.setPosition(rightIntakeArm.getPosition() + sign * TUNING_INCREMENT);
     }
 
 //    private double limitPower(double powerCmd, double pulledCurrent) {

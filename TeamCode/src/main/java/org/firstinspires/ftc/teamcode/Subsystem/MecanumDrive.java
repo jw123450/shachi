@@ -20,17 +20,10 @@ public class MecanumDrive {
     OpMode opmode;
     private DcMotorEx Fl, Fr, Bl, Br;
     private volatile double prevFrontLeftPower, prevBackLeftPower, prevFrontRightPower, prevBackRightPower;
-    public PinpointManager pinpoint = new PinpointManager();
-    ElapsedTime timer = new ElapsedTime();
 
     public static double SLOW_MODE_FACTOR = 0.5;
-    public static double CACHING_THRESHOLD = 0.005;
+    public static double CACHING_THRESHOLD = 0.005; // TODO
     public static double SCALING_EXPONENT = 2.2;
-
-    public volatile boolean angleLockBool = false, slowModeBool = false;
-
-    public static double Kp = 0.0007; // TODO
-    public static double Kd = 0.0001; // TODO
 
 //    private VoltageSensor battery;
 
@@ -63,55 +56,6 @@ public class MecanumDrive {
         this.Bl = robotHardware.Bl;
         this.Br = robotHardware.Br;
     }
-
-    public void operateTesting() {
-        pinpoint.operateSimple();
-
-        slowModeBool = opmode.gamepad1.left_trigger > 0.1;
-        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, slowModeBool);
-
-        // gyro reset
-        if (opmode.gamepad1.b) {pinpoint.softResetYaw();}
-
-        // sets target
-        if (opmode.gamepad1.a) {targetAngle = pinpoint.relativeNormalizedHeading;}
-
-        opmode.telemetry.addData("Current Scaling Exponent: input^", SCALING_EXPONENT);
-        opmode.telemetry.addData("rel normalized heading: ", pinpoint.relativeNormalizedHeading);
-        opmode.telemetry.addData("normalized heading: ", pinpoint.normalizedHeading);
-        opmode.telemetry.addData("target heading: ", targetAngle);
-        opmode.telemetry.addData("gyro offset: ", pinpoint.offset);
-        opmode.telemetry.addData("PD calculated rx [-1,1]: ", PDTurning(targetAngle, pinpoint.relativeNormalizedHeading));
-        opmode.telemetry.addData("normalized error: ", normalizeError(targetAngle - pinpoint.relativeNormalizedHeading));
-    }
-
-//    public void operateTuningPD() {
-//        // changing Kp and Kd values should already update globally
-//        // just get heading
-////        double tAngle = ll3a.getTargetAngle();
-//
-//        pinpoint.operateSimple();
-//
-//        // TODO: PD TURNING NEEDS TO HAVE ENOUGH POWER TO LOCK ONTO APRIL TAG WHEN SLOWMODE
-//        if (opmode.gamepad1.right_trigger > 0.1){
-////            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, PDTurning(tAngle, pinpoint.relativeNormalizedHeading), opmode.gamepad1.right_bumper);
-//        } else {
-//            operateSimple();
-//        }
-//
-//        if (opmode.gamepad1.dpad_down) {
-//            setTargetToCurrentHeading();
-//        }
-//
-//        // not very necessary since running robot centric, but might as well include it
-//        opmode.telemetry.addData("rel normalized heading: ", pinpoint.relativeNormalizedHeading);
-//        opmode.telemetry.addData("gyro offset: ", pinpoint.offset);
-//        opmode.telemetry.addData("normalized heading: ", pinpoint.normalizedHeading);
-////        opmode.telemetry.addData("target heading: ", tAngle);
-//        opmode.telemetry.addData("PD calculated rx [-1,1]: ", getPDPower());
-////        opmode.telemetry.addData("Tx: ", ll3a.getTx());
-////        opmode.telemetry.addData("normalized error:", normalizeError(tAngle - pinpoint.relativeNormalizedHeading));
-//    }
 
     public void operateSimple() {
 //        if (timer.milliseconds() > 100) {
@@ -192,67 +136,23 @@ public class MecanumDrive {
 
     // checks if powers are different enough
     public boolean comparePower(double prevPower, double currentPower) {
-        return Math.abs(currentPower - prevPower) >= CACHING_THRESHOLD;
+        return Math.abs(currentPower - prevPower) > CACHING_THRESHOLD;
     }
 
-    public double PDTurning(double targetHeading, double currentHeading) {
-        // calculate the error
-        double error = normalizeError(currentHeading - targetHeading);
-
-        double derivative = (error - lastError) / timer.seconds();
-
-        double output = (Kp * error) + (Kd * derivative);
-//        output = Math.signum(output) * Math.sqrt(Math.abs(output));
-        output = Math.max(-1, Math.min(1, output));
-        // square root PID, if robot is too fat and has too much inertia to fix small error
-        // FLOAT mode might make tuning very hard :noooo:, since it could depend on robot's strafe movement, and a lot on mass
-        // double output = Math.signum(output) * Math.min(1, Math.sqrt(Math.abs(output)));
-        // double output = Math.signum(output) * Math.min(1, Math.pow(Math.abs(output), 0.7)); // 0.3-0.7 are all options too depends on robot fatness
-
-        // reset stuff for next time
-        timer.reset();
-        lastError = error;
-
-        return output;
-    }
-
-    private double normalizeError(double error) {
-        // Normalize error to -180 to 180
-        while (error > 180) error -= 360;
-        while (error < -180) error += 360;
-        return error;
-    }
-
-//    public double scaleJoystick(double input) {
-//        return Math.signum(input) * Math.pow(Math.abs(input), SCALING_EXPONENT);
+//    private void readCurrents() {
+//        motorCurrents.set(0, Fl.getCurrent(CurrentUnit.AMPS));
+//        motorCurrents.set(1, Fr.getCurrent(CurrentUnit.AMPS));
+//        motorCurrents.set(2, Bl.getCurrent(CurrentUnit.AMPS));
+//        motorCurrents.set(3, Br.getCurrent(CurrentUnit.AMPS));
 //    }
 //
-//    public void setTargetToCurrentHeading() {
-//        this.targetAngle = pinpoint.relativeNormalizedHeading;
+//    // unfortunately allows current to spike for a single loop, but should be negligible
+//    private double limitPower(double powerCmd, int i) {
+//        double pulledCurrent = motorCurrents.get(i);
+//        if (pulledCurrent > CURRENT_LIMIT) {
+//            double scale = CURRENT_LIMIT / pulledCurrent;
+//            powerCmd *= scale;
+//        }
+//        return powerCmd;
 //    }
-//
-//    public void setTargetAngle(double angle) {
-//        this.targetAngle = angle;
-//    }
-//
-//    public double getPDPower() {
-//        return PDTurning(targetAngle, pinpoint.relativeNormalizedHeading);
-//    }
-
-    private void readCurrents() {
-        motorCurrents.set(0, Fl.getCurrent(CurrentUnit.AMPS));
-        motorCurrents.set(1, Fr.getCurrent(CurrentUnit.AMPS));
-        motorCurrents.set(2, Bl.getCurrent(CurrentUnit.AMPS));
-        motorCurrents.set(3, Br.getCurrent(CurrentUnit.AMPS));
-    }
-
-    // unfortunately allows current to spike for a single loop, but should be negligible
-    private double limitPower(double powerCmd, int i) {
-        double pulledCurrent = motorCurrents.get(i);
-        if (pulledCurrent > CURRENT_LIMIT) {
-            double scale = CURRENT_LIMIT / pulledCurrent;
-            powerCmd *= scale;
-        }
-        return powerCmd;
-    }
 }

@@ -9,15 +9,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
 
 @TeleOp(name = "Flywheel V2 Tuning", group = "Testing")
-public class TuningFlywheelV2 extends OpMode{
+public class ShooterTuning extends OpMode{
 
     private Shooter shooter = new Shooter();
+    private Intake intake = new Intake();
     RobotHardware robotHardware = new RobotHardware();
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
@@ -34,6 +36,7 @@ public class TuningFlywheelV2 extends OpMode{
     public void init() {
         robotHardware.initialize(this);
         shooter.initialize(this, robotHardware);
+        intake.initialize(this, robotHardware);
 
         // loop time stuff
         elapsedtime = new ElapsedTime();
@@ -66,7 +69,7 @@ public class TuningFlywheelV2 extends OpMode{
             /// HOLD left trigger to activate PID
             /// REFERENCE GOOGLE DOC FOR MORE
 
-            /// TUNING SERVO LATCH (read driver hub telemetry or FTC dash)
+            /// TUNING SERVO LATCH (read driver hub telemetry)
             // Y: incremental +
             // A: incremental -
 
@@ -77,8 +80,8 @@ public class TuningFlywheelV2 extends OpMode{
             shooter.operateTuning(packet);
         }
 
-        /// if we want to test realistic rapid fire
-        robotHardware.intakeMotor.setPower(-gamepad1.right_trigger);
+        /// to test rapid fire
+        intake.operateSimple();
 
         // loop time measuring
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
