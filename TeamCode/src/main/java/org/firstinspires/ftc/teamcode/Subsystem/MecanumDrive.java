@@ -23,7 +23,6 @@ public class MecanumDrive {
 
     public static double SLOW_MODE_FACTOR = 0.5;
     public static double CACHING_THRESHOLD = 0.005; // TODO
-    public static double SCALING_EXPONENT = 2.2;
 
 //    private VoltageSensor battery;
 
@@ -67,7 +66,7 @@ public class MecanumDrive {
     }
 
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
-        x = x * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 0.8);
+        x = x * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
         rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 1);
         // calculating output
@@ -98,10 +97,6 @@ public class MecanumDrive {
     }
 
     public void operateFieldCentric(double heading) {
-//        if (timer.milliseconds() > 100) {
-//            readCurrents();
-//            timer.reset();
-//        }
         driveFieldCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, heading, opmode.gamepad1.right_stick_button || opmode.gamepad1.left_bumper);
         opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
     }

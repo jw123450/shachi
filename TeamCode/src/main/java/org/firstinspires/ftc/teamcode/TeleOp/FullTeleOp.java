@@ -41,6 +41,8 @@ public class FullTeleOp extends OpMode {
     private RGBLights lights = new RGBLights();
 
     private final double MINIMUM_RPM = 2000;
+    private final double LATCH_OPENING_DELAY = 0.01;
+    private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double SINGLE_SHOT_DELAY = 0.5;
     private final double RAPID_FIRE_DELAY = 0.63;
     private final double RGB_ALERT_DELAY = 1.5; // seconds
@@ -180,8 +182,9 @@ public class FullTeleOp extends OpMode {
                     /// SINGLE SHOT
                     useManualIntake = false;
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> intake.runTransferOnly()),
                             new InstantAction(() -> shooter.openLatch()),
+                            new SleepAction(LATCH_OPENING_DELAY),
+                            new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(SINGLE_SHOT_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
                             new InstantAction(() -> intake.idle()),
@@ -193,8 +196,10 @@ public class FullTeleOp extends OpMode {
                     /// RAPID FIRE
                     useManualIntake = false;
                     runningActions.add(new SequentialAction(
-                            new SleepAction(0.03),
                             new InstantAction(() -> shooter.openLatch()),
+                            new SleepAction(LATCH_OPENING_DELAY),
+                            new InstantAction(() -> intake.runTransferOnly()),
+                            new SleepAction(TRANSFER_ONLY_DELAY),
                             new InstantAction(() -> intake.intakeFullPower()),
                             new SleepAction(RAPID_FIRE_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
@@ -285,7 +290,7 @@ public class FullTeleOp extends OpMode {
 //        }
 //        telemetry.addData("LL X", currentLLPose.getX());
 //        telemetry.addData("LL Y", currentLLPose.getY());
-        telemetry.addLine("\nPOSE"); // TODO: delete below when working correctly
+        telemetry.addLine("\nPOSE");
         telemetry.addData("pp X", pinpoint.X);
         telemetry.addData("pp Y", pinpoint.Y);
         telemetry.addData("pp heading (deg)", pinpoint.normalizedHeading);

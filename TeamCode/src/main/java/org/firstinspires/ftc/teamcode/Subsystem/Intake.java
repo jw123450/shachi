@@ -25,8 +25,8 @@ public class Intake {
     }
 
     // servo constants
-    public static double INTAKE_STOW = 0.5;
-    public static double INTAKE_DEPLOY = 0.5;
+    public static double INTAKE_STOW = 0.023;
+    public static double INTAKE_DEPLOY = 0.32;
     public static double TUNING_INCREMENT = 0.001;
 
     // motor constants
@@ -49,10 +49,11 @@ public class Intake {
         this.opmode = opmode;
         intakeMotor = robotHardware.intakeMotor;
         transferMotor = robotHardware.transferMotor;
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE); /// add BRAKE MODE?
+
         leftIntakeArm = robotHardware.leftIntakeServo;
-        rightIntakeArm = robotHardware.rightIntakeServo; /// add BRAKE MODE
+        rightIntakeArm = robotHardware.rightIntakeServo;
         rightIntakeArm.setDirection(Servo.Direction.REVERSE); /// maybe left reverse
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void operateTesting() {
@@ -85,13 +86,13 @@ public class Intake {
     }
 
     public void operateSimple() {
-        if (opmode.gamepad1.right_trigger > 0.1) {
-            intakeMotor.setPower(opmode.gamepad1.right_trigger);
-            transferMotor.setPower(opmode.gamepad1.right_trigger);
-        } else {
-            intakeMotor.setPower(0);
-            transferMotor.setPower(0);
+        if (opmode.gamepad1.rightBumperWasPressed()) { // prob breaks if spam click, but fix pretty simple
+            deployIntake();
+        } else if (opmode.gamepad1.rightBumperWasReleased()) {
+            stowIntake();
         }
+        intakeMotor.setPower(opmode.gamepad1.right_trigger);
+        transferMotor.setPower(opmode.gamepad1.left_trigger);
     }
 
     public void operateTeleOp() {

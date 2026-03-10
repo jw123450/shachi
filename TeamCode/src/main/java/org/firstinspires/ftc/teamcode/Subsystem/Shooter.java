@@ -70,10 +70,12 @@ public class Shooter {
         this.ShooterR = robotHardware.ShooterR;
         this.ShooterL = robotHardware.ShooterL;
         this.hoodAngleAdjust = robotHardware.hoodAngleAdjust;
+        this.shooterLatch = robotHardware.shooterLatch;
 
         ShooterL.setDirection(DcMotorSimple.Direction.REVERSE);
         ShooterR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         ShooterR.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        ShooterL.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void operateTuning(TelemetryPacket packet) {

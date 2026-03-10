@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -22,7 +23,9 @@ public class RobotHardware {
     public Servo RGBIndicatorL, RGBIndicatorR;
     public Servo hoodAngleAdjust, shooterLatch;
 
-    public AnalogInput rightTurretAnalog, transferBreakBeam,middleBreakBeam, intakeBreakBeam;
+    public AnalogInput rightTurretAnalog;
+//    public AnalogInput transferBreakBeam, middleBreakBeam, intakeBreakBeam;
+    public DigitalChannel transferBreakBeam,middleBreakBeam, intakeBreakBeam;
 
     public VoltageSensor battery;
 
@@ -38,10 +41,10 @@ public class RobotHardware {
 
             SENSORS
             pinpoint            - CHUB i2c 1
-            turret analog input - CHUB analog 4
-            break beam transfer - CHUB analog 0
-            break beam middle   - CHUB analog 2
-            break beam intake   - CHUB analog 1
+            turret analog input - CHUB analog 3
+            break beam transfer - CHUB digital 5
+            break beam middle   - CHUB digital 3
+            break beam intake   - CHUB digital 1
 
             MOTOR
             Fl - EHUB0
@@ -57,19 +60,30 @@ public class RobotHardware {
             leftTurretServo  - SHUB 3
             rightTurretServo - SHUB 2
             hoodAngleAdjust  - SHUB 0
-            shooterLatch     - EIJNDINOIAOIPSANDOPIDANODPSINSIOADNDSOIPNDSAO
-            leftIntakeServo  - EHUB 0
-            RGB light L      - EHUB 0
-            rightIntakeServo - CHUB 5
-            RGB light R      - CHUB 5
+            Intake Servo L   - EHUB 0
+            RGB light L      - EHUB 5
+            Intake Servo R   - CHUB 5
+            shooterLatch     - CHUB 2
+            RGB light R      - CHUB 0
 
          */
         battery = opmode.hardwareMap.voltageSensor.iterator().next();
 
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
-        middleBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "middleBreak");
-        intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
+
+//        intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
+//        middleBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "middleBreak");
+//        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
+
+        intakeBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "intakeBreak");
+        middleBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "middleBreak");
+        transferBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "transferBreak");
+        intakeBreakBeam.setMode(DigitalChannel.Mode.INPUT);
+        middleBreakBeam.setMode(DigitalChannel.Mode.INPUT);
+        transferBreakBeam.setMode(DigitalChannel.Mode.INPUT);
+        /// telemetry.addData("intake beam state", intakeBreakBeam.getState())
+        /// boolean beamBroken = !intakeBreakBeam.getState();
+
         rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 
 //        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
@@ -91,7 +105,7 @@ public class RobotHardware {
         leftIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeL");
         rightIntakeServo = opmode.hardwareMap.get(Servo.class, "intakeR");
         hoodAngleAdjust = opmode.hardwareMap.get(Servo.class, "hoodangle");
-        //shooterLatch = opmode.hardwareMap.get(Servo.class, "latch");
+        shooterLatch = opmode.hardwareMap.get(Servo.class, "latch");
 
         RGBIndicatorL = opmode.hardwareMap.get(Servo.class, "lightL");
         RGBIndicatorR = opmode.hardwareMap.get(Servo.class, "lightR");

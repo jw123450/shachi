@@ -50,7 +50,7 @@ public class Turret {
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange && opmode.gamepad1.left_bumper) {
-            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+            setBoth(angleToServoPos(turretTargetAngle - opmode.gamepad1.right_stick_x * Kv));
         }
 
         packet.put("current angle", currentAngle);
@@ -74,11 +74,11 @@ public class Turret {
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange && opmode.gamepad1.right_trigger > 0.3) { // in code-limited range
-            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
             turretTargetAngle = 0;
-            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         }
 
         opmode.telemetry.addLine("\nTURRET");
