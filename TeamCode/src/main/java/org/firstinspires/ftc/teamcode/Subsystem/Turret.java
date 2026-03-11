@@ -58,6 +58,8 @@ public class Turret {
         packet.put("target angle", turretTargetAngle);
         opmode.telemetry.addData("right stick X", opmode.gamepad1.right_stick_x);
         opmode.telemetry.addData("current angle", currentAngle);
+        opmode.telemetry.addData("R assigned pos", rightServo.getPosition());
+        opmode.telemetry.addData("L assigned pos", leftServo.getPosition());
         opmode.telemetry.addData("target angle", turretTargetAngle);
         opmode.telemetry.addData("temp_target", temp_target);
     }

@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
 
-@TeleOp(name = "Flywheel V2 Tuning", group = "Testing")
-public class ShooterTuning extends OpMode{
+@TeleOp(name = "Shooter Tuning", group = "Testing")
+public class ShooterTuning extends OpMode {
 
     private Shooter shooter = new Shooter();
     private Intake intake = new Intake();

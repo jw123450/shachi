@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class AbsoluteAnalogEncoder implements HardwareDevice {
     private OpMode opmode;
-    private final double DEG_PER_VOLT = 360.0 / 3.3; /// TODO
+    private final double DEG_PER_VOLT = 360.0 / 3.179; 
     private final AnalogInput encoder;
     private ElapsedTime timer = new ElapsedTime();
     private double lastAngle;
