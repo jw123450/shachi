@@ -152,7 +152,7 @@ public class FullTeleOp extends OpMode {
         }
 
         /// REQUEST RAPID FIRE
-        if (gamepad1.rightBumperWasPressed() && !shooter.shooterLatchOpen) {
+        if (gamepad1.leftBumperWasPressed() && !shooter.shooterLatchOpen) {
             if (turret.targetInRange) {
                 vinWantsToShoot = true;
                 singleShot = false;
@@ -176,7 +176,7 @@ public class FullTeleOp extends OpMode {
 //        shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot) {
+        if (vinWantsToShoot && (gamepad1.leftBumperWasReleased() || singleShot)) {
             if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.shooterLatchOpen) {
                 if (singleShot) {
                     /// SINGLE SHOT
@@ -200,7 +200,7 @@ public class FullTeleOp extends OpMode {
                             new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(TRANSFER_ONLY_DELAY),
-                            new InstantAction(() -> intake.intakeFullPower()),
+                            new InstantAction(() -> intake.shootingIntake()),
                             new SleepAction(RAPID_FIRE_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
                             new InstantAction(() -> intake.idle()),
@@ -211,21 +211,7 @@ public class FullTeleOp extends OpMode {
             }
         }
 
-        // intake logic
-        if (useManualIntake) {
-            if (gamepad1.right_trigger > 0.6 && intake.intakeState != Intake.IntakeState.INTAKING_FULL_POWER) {
-                intake.intakeFullPower();
-            } else if (gamepad1.right_trigger > 0.1 && intake.intakeState != Intake.IntakeState.INTAKING) {
-                intake.intake();
-            } else if (gamepad1.aWasPressed() && intake.intakeState != Intake.IntakeState.REVERSE) {
-                intake.reverse();
-            } else if (gamepad1.aWasReleased() && intake.intakeState == Intake.IntakeState.REVERSE) {
-                intake.idle();
-            } else if (gamepad1.right_trigger <= 0.1 && intake.intakeState != Intake.IntakeState.IDLE && intake.intakeState != Intake.IntakeState.REVERSE) {
-                intake.idle();
-            }
-        }
-        intake.operateTeleOp();
+        intake.operateTeleOp(useManualIntake);
 
         // Reset functions
 //        if (gamepad1.left_trigger > 0.8) {

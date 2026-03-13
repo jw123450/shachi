@@ -1,27 +1,31 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@Configurable
+@Config
 public class Intake {
     OpMode opmode;
     public DcMotorEx intakeMotor, transferMotor;
     public Servo leftIntakeArm, rightIntakeArm;
+    public DigitalChannel transferBreakBeam, intakeBreakBeam;
+    private ElapsedTime intakeTimer = new ElapsedTime();
+    private ElapsedTime transferTimer = new ElapsedTime();
 
 
     public enum IntakeState {
         INTAKING,
-        INTAKING_FULL_POWER,
         REVERSE,
-        IDLE,
-        TRANSFERRING
+        IDLE
     }
 
     // servo constants
@@ -30,18 +34,20 @@ public class Intake {
     public static double TUNING_INCREMENT = 0.001;
 
     // motor constants
-    public static double INTAKING_FULL_POWER = 0.9;
-    public static double INTAKING_POWER = 0.7;
-    public static double REVERSE_POWER = -0.8;
+    public static double INTAKING_POWER = 0.9;
+    public static double INTAKING_TRANSFER_POWER = 0.508;
+    public static double REVERSE_POWER = -0.7;
     public static double IDLE_POWER = 0;
+
+    public static double INTAKE_DEBOUNCE_DELAY = 200; // ms
+    public static double TRANSFER_DEBOUNCE_DELAY = 80;
 
     // constantly updating states
     public volatile IntakeState intakeState = IntakeState.IDLE;
     public boolean isArmStowed = true;
-    public boolean isTransferring = false;
+    public boolean isFull, transferFull, intakeFull = true;
     public volatile double targetIntakePower = 0;
     public volatile double targetTransferPower = 0;
-//    public volatile boolean motorStalled = false;
 
     public Intake() {}
 
@@ -49,11 +55,14 @@ public class Intake {
         this.opmode = opmode;
         intakeMotor = robotHardware.intakeMotor;
         transferMotor = robotHardware.transferMotor;
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE); /// add BRAKE MODE?
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftIntakeArm = robotHardware.leftIntakeServo;
         rightIntakeArm = robotHardware.rightIntakeServo;
-        rightIntakeArm.setDirection(Servo.Direction.REVERSE); /// maybe left reverse
+        rightIntakeArm.setDirection(Servo.Direction.REVERSE);
+
+        transferBreakBeam = robotHardware.transferBreakBeam;
+        intakeBreakBeam = robotHardware.intakeBreakBeam;
     }
 
     public void operateTesting() {
@@ -83,21 +92,86 @@ public class Intake {
         opmode.telemetry.addData("right servo pos: ", rightIntakeArm.getPosition());
         opmode.telemetry.addData("stowed? ", isArmStowed);
         opmode.telemetry.addData("intake state enum: ", intakeState);
+        opmode.telemetry.addData("intake sens state ", intakeBreakBeam.getState());
+        opmode.telemetry.addData("transfer sens state: ", transferBreakBeam.getState());
+
     }
 
-    public void operateSimple() {
+    public void operateSimple(boolean separateMotors) {
         if (opmode.gamepad1.rightBumperWasPressed()) { // prob breaks if spam click, but fix pretty simple
             deployIntake();
         } else if (opmode.gamepad1.rightBumperWasReleased()) {
             stowIntake();
         }
-        intakeMotor.setPower(opmode.gamepad1.right_trigger);
-        transferMotor.setPower(opmode.gamepad1.left_trigger);
+        if (separateMotors) {
+            intakeMotor.setPower(opmode.gamepad1.right_trigger);
+            transferMotor.setPower(opmode.gamepad1.left_trigger);
+        } else {
+            intakeMotor.setPower(opmode.gamepad1.right_trigger);
+            transferMotor.setPower(opmode.gamepad1.right_trigger);
+        }
     }
 
-    public void operateTeleOp() {
+    public void operateTeleOp(boolean useManualIntake) {
+        /// breakbeams
+        boolean intakeReading = intakeBreakBeam.getState();
+        boolean transferReading = transferBreakBeam.getState();
+
+
+        // state changed -> start debounce timer
+        if (intakeReading != intakeFull) {
+            if (intakeTimer.milliseconds() > INTAKE_DEBOUNCE_DELAY) {
+                intakeFull = intakeReading;
+                intakeTimer.reset();
+            }
+        } else {
+            // reset timer if sensors match confirmed state
+            intakeTimer.reset();
+        }
+
+        if (transferReading != transferFull) {
+            if (transferTimer.milliseconds() > TRANSFER_DEBOUNCE_DELAY) {
+                transferFull = transferReading;
+                transferTimer.reset();
+            }
+        } else {
+            // reset timer if sensors match confirmed state
+            transferTimer.reset();
+        }
+
+        isFull = intakeFull && transferFull;
+
+        /// intake + transfer logic
+        if (useManualIntake) {
+            if (opmode.gamepad1.right_trigger > 0.2) {
+                if (transferFull) { runIntakeOnly(); }
+                else { intakingIntake(); }
+            } else if (opmode.gamepad1.aWasPressed() && intakeState != IntakeState.REVERSE) {
+                reverse();
+            } else if (opmode.gamepad1.aWasReleased() && intakeState == IntakeState.REVERSE) {
+                idle();
+            } else if (opmode.gamepad1.right_trigger <= 0.1 && intakeState != IntakeState.IDLE && intakeState != IntakeState.REVERSE) {
+                idle();
+            }
+        }
+
+        /// intake arm
+        if (isFull && !isArmStowed) {
+            stowIntake();
+        } else if (opmode.gamepad1.rightBumperWasPressed() && !isFull) {
+            toggleDropdown();
+        }
+
         intakeMotor.setPower(targetIntakePower);
         transferMotor.setPower(targetTransferPower);
+
+//        opmode.telemetry.addData("intake timer ms", intakeTimer.milliseconds());
+//        opmode.telemetry.addData("transfer timer ms", transferTimer.milliseconds());
+//        opmode.telemetry.addData("intakeReading", intakeReading);
+//        opmode.telemetry.addData("transferReading", transferReading);
+        opmode.telemetry.addData("intakeFull", intakeFull);
+        opmode.telemetry.addData("transferFull", transferFull);
+        opmode.telemetry.addData("isFull", isFull);
     }
 
     ///  asfadsfsdafadsfasdfasaxfaasdf
@@ -146,15 +220,15 @@ public class Intake {
     public void setTransfer(double power) {
         targetTransferPower = power;
     }
-    public void intakeFullPower() {
-        intakeState = IntakeState.INTAKING;
-        setIntake(INTAKING_FULL_POWER);
-        setTransfer(INTAKING_FULL_POWER);
-    }
-    public void intake() {
+    public void shootingIntake() {
         intakeState = IntakeState.INTAKING;
         setIntake(INTAKING_POWER);
         setTransfer(INTAKING_POWER);
+    }
+    public void intakingIntake() {
+        intakeState = IntakeState.INTAKING;
+        setIntake(INTAKING_POWER);
+        setTransfer(INTAKING_TRANSFER_POWER);
     }
     public void reverse() {
         intakeState = IntakeState.REVERSE;
@@ -167,9 +241,15 @@ public class Intake {
         setTransfer(IDLE_POWER);
     }
     public void runTransferOnly() {
-        intakeState = IntakeState.TRANSFERRING;
+        intakeState = IntakeState.INTAKING;
         setIntake(IDLE_POWER);
-        setTransfer(INTAKING_FULL_POWER);
+        setTransfer(INTAKING_POWER);
+    }
+
+    public void runIntakeOnly() {
+        intakeState = IntakeState.INTAKING;
+        setIntake(INTAKING_POWER);
+        setTransfer(IDLE_POWER);
     }
 
     // ball pusher helper methods
@@ -183,6 +263,14 @@ public class Intake {
         leftIntakeArm.setPosition(INTAKE_STOW);
         rightIntakeArm.setPosition(INTAKE_STOW);
         isArmStowed = true;
+    }
+
+    public void toggleDropdown() {
+        if (isArmStowed) {
+            deployIntake();
+        } else {
+            stowIntake();
+        }
     }
 
     public void incremental(int sign) {

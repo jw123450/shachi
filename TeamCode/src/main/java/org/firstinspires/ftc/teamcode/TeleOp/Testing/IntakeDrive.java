@@ -28,7 +28,7 @@ public class IntakeDrive extends OpMode{
     @Override
     public void loop() {
         drive.operateSimple();
-        intake.operateSimple();
+        intake.operateSimple(true);
         // dpad_up: incremental -
         // dpad_down: incremental +
         // A: stow (after changing values and loading onto bot)

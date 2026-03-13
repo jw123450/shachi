@@ -24,8 +24,7 @@ public class RobotHardware {
     public Servo hoodAngleAdjust, shooterLatch;
 
     public AnalogInput rightTurretAnalog;
-//    public AnalogInput transferBreakBeam, middleBreakBeam, intakeBreakBeam;
-    public DigitalChannel transferBreakBeam,middleBreakBeam, intakeBreakBeam;
+    public DigitalChannel transferBreakBeam, intakeBreakBeam;
 
     public VoltageSensor battery;
 
@@ -42,9 +41,8 @@ public class RobotHardware {
             SENSORS
             pinpoint            - CHUB i2c 1
             turret analog input - CHUB analog 3
-            break beam transfer - CHUB digital 5
-            break beam middle   - CHUB digital 3
-            break beam intake   - CHUB digital 1
+            intake dist sens   - CHUB digital 0
+            transfer dist sens - CHUB digital 4
 
             MOTOR
             Fl - EHUB0
@@ -76,13 +74,10 @@ public class RobotHardware {
 //        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
 
         intakeBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "intakeBreak");
-        middleBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "middleBreak");
         transferBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "transferBreak");
         intakeBreakBeam.setMode(DigitalChannel.Mode.INPUT);
-        middleBreakBeam.setMode(DigitalChannel.Mode.INPUT);
         transferBreakBeam.setMode(DigitalChannel.Mode.INPUT);
         /// telemetry.addData("intake beam state", intakeBreakBeam.getState())
-        /// boolean beamBroken = !intakeBreakBeam.getState();
 
         rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 

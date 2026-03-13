@@ -64,6 +64,7 @@ public class ShooterTuning extends OpMode {
         if (gamepad1.left_bumper) {
             /// Manual power control with GP1 left joystick Y
             shooter.operateFindMaxRPM();
+            intake.operateSimple(true);
         } else {
             /// TUNING FLYWHEEL PID
             /// HOLD left trigger to activate PID
@@ -78,10 +79,8 @@ public class ShooterTuning extends OpMode {
             // X: incremental -
 
             shooter.operateTuning(packet);
+            intake.operateSimple(false);
         }
-
-        /// to test rapid fire
-        intake.operateSimple();
 
         // loop time measuring
         telemetry.addData("Loop Times", elapsedtime.milliseconds());

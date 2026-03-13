@@ -72,7 +72,7 @@ public class Shooter {
         this.hoodAngleAdjust = robotHardware.hoodAngleAdjust;
         this.shooterLatch = robotHardware.shooterLatch;
 
-        ShooterL.setDirection(DcMotorSimple.Direction.REVERSE);
+        ShooterR.setDirection(DcMotorSimple.Direction.REVERSE);
         ShooterR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         ShooterR.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         ShooterL.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -80,7 +80,12 @@ public class Shooter {
 
     public void operateTuning(TelemetryPacket packet) {
         double currentRPM = getCurrentRPM();
-        targetRPM = TEMP_RPM;
+
+        if (opmode.gamepad1.dpad_up)        { targetRPM = 3000; }
+        else if (opmode.gamepad1.dpad_down) { targetRPM = 2000; }
+        else if (opmode.gamepad1.dpad_left) { targetRPM = 0; }
+        else if (opmode.gamepad1.dpad_right){ targetRPM = TEMP_RPM;}
+
 
         if (opmode.gamepad1.left_trigger > 0.2) {
             output = update(currentRPM);
@@ -115,7 +120,7 @@ public class Shooter {
 //            hoodAngleAdjust.setPosition(HOOD_ANGLE_MIN_POS);
             incremental(hoodAngleAdjust, -1);
         }
-//        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
+///        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
 
         opmode.telemetry.addData("hood adjust pos ", hoodAngleAdjust.getPosition());
         opmode.telemetry.addData("latch pos ", shooterLatch.getPosition());
