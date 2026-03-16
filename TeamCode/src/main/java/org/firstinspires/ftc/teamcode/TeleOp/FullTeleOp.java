@@ -121,44 +121,18 @@ public class FullTeleOp extends OpMode {
         for (Action action : runningActions) { if (action.run(packet)) { newActions.add(action); } }
         runningActions = newActions;
 
-        /// check google slides for controls
-        // ALLIANCE SWITCH
-        if (gamepad2.b) {
-            blueAlliance = false;
-            alertAction(RGBLights.Colors.RED);
-        } else if (gamepad2.x) {
-            blueAlliance = true;
-            alertAction(RGBLights.Colors.BLUE);
-        }
-
         // operate loops
         pinpoint.operateTrackingPose(); // Changes X and Y to pedro coordinates
         drive.operateSimple();
 
-        // toggling idle RPM
-        if (gamepad1.xWasPressed()) {
-            if (cyclingFarZone) { // toggle from far to near
-                cyclingFarZone = false;
-                alertAction(RGBLights.Colors.YELLOW);
-            } else { // toggle from near to far
-                cyclingFarZone = true;
-                alertAction(RGBLights.Colors.VIOLET);
-            }
-        }
-
-        // default to orange or violet when no active alerts
-        if (lights.currentColor == RGBLights.Colors.WHITE) {
-            runningActions.add(new InstantAction(() -> lights.setColor(cyclingFarZone ? RGBLights.Colors.VIOLET : RGBLights.Colors.YELLOW)));
-        }
-
         /// REQUEST RAPID FIRE
         if (gamepad1.leftBumperWasPressed() && !shooter.shooterLatchOpen) {
-            if (turret.targetInRange) {
+//            if (turret.targetInRange) {
                 vinWantsToShoot = true;
                 singleShot = false;
-            } else {
-                alertAction(RGBLights.Colors.RED);
-            }
+//            } else {
+//                alertAction(RGBLights.Colors.RED);
+//            }
         }
         /// REQUEST SINGLE SHOT
         else if (gamepad1.dpadLeftWasPressed() && !shooter.shooterLatchOpen) {
@@ -170,13 +144,13 @@ public class FullTeleOp extends OpMode {
             }
         }
 
-        // operate loops (ugly to put here, but fixes small bug)
-        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
+        // more operate loops (ugly to put here, but fixes small bug)
         turret.operateBasic(pinpoint.X, pinpoint.Y, pinpoint.normalizedHeading, blueAlliance, vinWantsToShoot);
+        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
 //        shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot && (gamepad1.leftBumperWasReleased() || singleShot)) {
+        if (vinWantsToShoot && (gamepad1.leftBumperWasReleased() || singleShot)) { /// logic might be fried here
             if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.shooterLatchOpen) {
                 if (singleShot) {
                     /// SINGLE SHOT
@@ -237,6 +211,31 @@ public class FullTeleOp extends OpMode {
 //                alertAction(RGBLights.Colors.GREEN);
 //            }
 //        }
+
+        // toggling idle RPM
+        if (gamepad1.xWasPressed()) {
+            if (cyclingFarZone) { // toggle from far to near
+                cyclingFarZone = false;
+                alertAction(RGBLights.Colors.YELLOW);
+            } else { // toggle from near to far
+                cyclingFarZone = true;
+                alertAction(RGBLights.Colors.VIOLET);
+            }
+        }
+
+        // default to orange or violet when no active alerts
+        if (lights.currentColor == RGBLights.Colors.WHITE) {
+            runningActions.add(new InstantAction(() -> lights.setColor(cyclingFarZone ? RGBLights.Colors.VIOLET : RGBLights.Colors.YELLOW)));
+        }
+
+        // ALLIANCE SWITCH
+        if (gamepad2.b) {
+            blueAlliance = false;
+            alertAction(RGBLights.Colors.RED);
+        } else if (gamepad2.x) {
+            blueAlliance = true;
+            alertAction(RGBLights.Colors.BLUE);
+        }
 
         // manual driver 2 goal pose adjust
         if (gamepad2.right_bumper) {
