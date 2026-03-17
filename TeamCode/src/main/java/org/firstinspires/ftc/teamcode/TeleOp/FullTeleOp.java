@@ -106,7 +106,7 @@ public class FullTeleOp extends OpMode {
     @Override
     public void start() {
         shooter.closeLatch();
-//        intake.deployIntake();
+        intake.stowIntake();
         pinpoint.transferAutoPose(Globals.autoEndPose);
         shooter.autoRPMmode = true;
         lights.setColor(RGBLights.Colors.WHITE);

@@ -50,12 +50,15 @@ public class Turret {
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange && opmode.gamepad1.left_bumper) {
-            setBoth(angleToServoPos(turretTargetAngle - opmode.gamepad1.right_stick_x * Kv));
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+        } else if (opmode.gamepad1.a) {
+            setBoth(0.5);
         }
 
         packet.put("current angle", currentAngle);
         packet.put("assigned pos", leftServo.getPosition());
         packet.put("target angle", turretTargetAngle);
+        opmode.telemetry.addData("chassisNormalizedHeading", chassisNormalizedHeading);
         opmode.telemetry.addData("right stick X", opmode.gamepad1.right_stick_x);
         opmode.telemetry.addData("current angle", currentAngle);
         opmode.telemetry.addData("R assigned pos", rightServo.getPosition());
@@ -164,12 +167,12 @@ public class Turret {
     }
 
     public double getAssignedTurretAngle() { // relative to bot
-        return 355*(leftServo.getPosition() - 0.5);
+        return 355*(leftServo.getPosition());
     }
 
     public double angleToServoPos(double angle) {
         // technically should limit input range, but will be taken care of somewhere else
-        return (angle / 355) + 0.5;
+        return norm360(angle - 2.5) / 355;
     }
 
     private double normalize(double angle) {
@@ -178,4 +181,9 @@ public class Turret {
         return angle;
     }
 
+    private double norm360(double angle) {
+        while (angle > 360) angle -= 360;
+        while (angle < 0) angle += 360;
+        return angle;
+    }
 }

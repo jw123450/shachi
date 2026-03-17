@@ -26,8 +26,8 @@ public class Shooter {
     public static double AT_RPM_RANGE = 50;
 
     // PID constants
-    public static double kV = 0.000179213; // 1/6000
-    public static double kP = 0.018;
+    public static double kV = 0.000198654; // 1/6000
+    public static double kP = 0.005;
     public static double kS = 0;
 
     // hood angle adjust
