@@ -21,12 +21,12 @@ public class Shooter {
     // RPM targets
 //    public static double MINIMUM_RPM = 2000;
 //    public static double MAXIMUM_RPM = 4500;
-    public static double IDLE_NEAR_RPM = 2200;
-    public static double IDLE_FAR_RPM = 3000;
+    public static double IDLE_NEAR_RPM = 1500;
+    public static double IDLE_FAR_RPM = 2000;
     public static double AT_RPM_RANGE = 50;
 
     // PID constants
-    public static double kV = 0.000198654; // 1/6000
+    public static double kV = 0.000298507; // 1/6000
     public static double kP = 0.005;
     public static double kS = 0;
 
@@ -47,10 +47,10 @@ public class Shooter {
 
     // REGRESSION CONSTANTS
     // from desmos
-    double a1 = 1525.92733;
-    double b1 = 0.0396175;
-    double c1 = 4.20534;
-    double d1 = 2000;
+    double a1 = 1300;
+    double b1 = 0.0561225;
+    double c1 = 6.1292;
+    double d1 = 1500;
     double a2 = 15.32632;
     double b2 = 0.109589;
     double c2 = 9.73917;
@@ -81,10 +81,12 @@ public class Shooter {
     public void operateTuning(TelemetryPacket packet) {
         double currentRPM = getCurrentRPM();
 
-        if (opmode.gamepad1.dpad_up)        { targetRPM = 3000; }
-        else if (opmode.gamepad1.dpad_down) { targetRPM = 2000; }
-        else if (opmode.gamepad1.dpad_left) { targetRPM = 0; }
-        else if (opmode.gamepad1.dpad_right){ targetRPM = TEMP_RPM;}
+//        if (opmode.gamepad1.dpad_up)        { targetRPM = 2500; }
+//        else if (opmode.gamepad1.dpad_down) { targetRPM = 1800; }
+//        else if (opmode.gamepad1.dpad_left) { targetRPM = 0; }
+//        else if (opmode.gamepad1.dpad_right){ targetRPM = TEMP_RPM;}
+
+        targetRPM = TEMP_RPM;
 
 
         if (opmode.gamepad1.left_trigger > 0.2) {
@@ -152,8 +154,8 @@ public class Shooter {
         if (autoRPMmode) {
             if (vinWantsToShoot) {
                 targetRPM = distanceToRPM(dist);
-                targetHoodAngle = distanceToHoodAngle(dist);
-                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+//                targetHoodAngle = distanceToHoodAngle(dist);
+//                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
             } else if (cyclingFarZone) {
                 targetRPM = IDLE_FAR_RPM;
             } else {

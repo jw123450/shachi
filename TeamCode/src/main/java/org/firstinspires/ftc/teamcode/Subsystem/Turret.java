@@ -14,11 +14,12 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 public class Turret {
     OpMode opmode;
     Servo leftServo, rightServo;
-    AbsoluteAnalogEncoder rightServoEnc;
+    public AbsoluteAnalogEncoder rightServoEnc;
 
-    public static double CCW_LIMIT = -2.5; // code limit
-    public static double CW_LIMIT = 2.5; // code limit
+    public static double CCW_LIMIT = -20; // code limit
+    public static double CW_LIMIT = 20; // code limit
     public static double AT_TARGET_RANGE = 5; // in degrees
+    public static double SERVO_MAX_RANGE = 320;
 
     public static double Kv = 0; /// TODO later
 
@@ -28,7 +29,7 @@ public class Turret {
     private double lastError;
     ElapsedTime timer = new ElapsedTime();
     private double output = 0;
-    private double turretTargetAngle = 180;
+    public double turretTargetAngle = 180;
     public boolean targetInRange = true;
     public boolean atTargetAngle = true;
 
@@ -52,7 +53,9 @@ public class Turret {
         if (targetInRange && opmode.gamepad1.left_bumper) {
             setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         } else if (opmode.gamepad1.a) {
-            setBoth(0.5);
+            setBoth(0);
+        } else if (opmode.gamepad1.b) {
+            setBoth(1);
         }
 
         packet.put("current angle", currentAngle);
@@ -60,10 +63,12 @@ public class Turret {
         packet.put("target angle", turretTargetAngle);
         opmode.telemetry.addData("chassisNormalizedHeading", chassisNormalizedHeading);
         opmode.telemetry.addData("right stick X", opmode.gamepad1.right_stick_x);
-        opmode.telemetry.addData("current angle", currentAngle);
         opmode.telemetry.addData("R assigned pos", rightServo.getPosition());
         opmode.telemetry.addData("L assigned pos", leftServo.getPosition());
+        opmode.telemetry.addData("current angle", currentAngle);
+        opmode.telemetry.addData("targetInRange", targetInRange);
         opmode.telemetry.addData("target angle", turretTargetAngle);
+        opmode.telemetry.addData("atTargetAngle", atTargetAngle);
         opmode.telemetry.addData("temp_target", temp_target);
     }
 
@@ -79,11 +84,11 @@ public class Turret {
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (vinWantsToShoot && targetInRange) { // in code-limited range
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
             turretTargetAngle = 180;
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            setBoth(angleToServoPos(turretTargetAngle));
         }
 
         opmode.telemetry.addLine("\nTURRET");
@@ -166,13 +171,9 @@ public class Turret {
         rightServo.setPosition(pos);
     }
 
-    public double getAssignedTurretAngle() { // relative to bot
-        return 355*(leftServo.getPosition());
-    }
-
     public double angleToServoPos(double angle) {
         // technically should limit input range, but will be taken care of somewhere else
-        return norm360(angle - 2.5) / 355;
+        return norm360(angle - CW_LIMIT) / SERVO_MAX_RANGE;
     }
 
     private double normalize(double angle) {

@@ -105,6 +105,7 @@ public class FullTeleOp extends OpMode {
 
     @Override
     public void start() {
+        turret.setBoth(0.5);
         shooter.closeLatch();
         intake.stowIntake();
         pinpoint.transferAutoPose(Globals.autoEndPose);
@@ -126,7 +127,7 @@ public class FullTeleOp extends OpMode {
         drive.operateSimple();
 
         /// REQUEST RAPID FIRE
-        if (gamepad1.leftBumperWasPressed() && !shooter.shooterLatchOpen) {
+        if (gamepad2.leftBumperWasPressed() && !shooter.shooterLatchOpen) {
 //            if (turret.targetInRange) {
                 vinWantsToShoot = true;
                 singleShot = false;
@@ -135,7 +136,7 @@ public class FullTeleOp extends OpMode {
 //            }
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad1.dpadLeftWasPressed() && !shooter.shooterLatchOpen) {
+        else if (gamepad2.dpadLeftWasPressed() && !shooter.shooterLatchOpen) {
             if (turret.targetInRange) {
                 vinWantsToShoot = true;
                 singleShot = true;
@@ -150,7 +151,7 @@ public class FullTeleOp extends OpMode {
 //        shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot && (gamepad1.leftBumperWasReleased() || singleShot)) { /// logic might be fried here
+        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) { /// logic might be fried here
             if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.shooterLatchOpen) {
                 if (singleShot) {
                     /// SINGLE SHOT

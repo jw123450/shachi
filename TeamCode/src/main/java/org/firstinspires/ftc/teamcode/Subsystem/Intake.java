@@ -117,7 +117,6 @@ public class Intake {
         boolean intakeReading = intakeBreakBeam.getState();
         boolean transferReading = transferBreakBeam.getState();
 
-
         // state changed -> start debounce timer
         if (intakeReading != intakeFull) {
             if (intakeTimer.milliseconds() > INTAKE_DEBOUNCE_DELAY) {
@@ -159,7 +158,9 @@ public class Intake {
         if (isFull && !isArmStowed) {
             stowIntake();
         } else if (opmode.gamepad1.rightBumperWasPressed() && !isFull) {
-            toggleDropdown();
+            deployIntake();
+        } else if (opmode.gamepad1.rightBumperWasReleased() && !isFull) {
+            stowIntake();
         }
 
         intakeMotor.setPower(targetIntakePower);
