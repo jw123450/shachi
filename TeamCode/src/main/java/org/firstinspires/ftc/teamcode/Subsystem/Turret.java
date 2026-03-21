@@ -16,10 +16,10 @@ public class Turret {
     Servo leftServo, rightServo;
     public AbsoluteAnalogEncoder rightServoEnc;
 
-    public static double CCW_LIMIT = -20; // code limit
-    public static double CW_LIMIT = 20; // code limit
+    public static double CCW_LIMIT = -6; // code limit
+    public static double CW_LIMIT = 6; // code limit
     public static double AT_TARGET_RANGE = 5; // in degrees
-    public static double SERVO_MAX_RANGE = 320;
+    public static double SERVO_MAX_RANGE = 348;
 
     public static double Kv = 0; /// TODO later
 
@@ -52,10 +52,12 @@ public class Turret {
 
         if (targetInRange && opmode.gamepad1.left_bumper) {
             setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
-        } else if (opmode.gamepad1.a) {
+        } else if (opmode.gamepad1.x) {
             setBoth(0);
         } else if (opmode.gamepad1.b) {
             setBoth(1);
+        } else if (opmode.gamepad1.a) {
+            setBoth(0.5);
         }
 
         packet.put("current angle", currentAngle);
