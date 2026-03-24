@@ -26,9 +26,6 @@ public class Turret {
     public static double temp_target = 180;
 
     // changing variables
-    private double lastError;
-    ElapsedTime timer = new ElapsedTime();
-    private double output = 0;
     public double turretTargetAngle = 180;
     public boolean targetInRange = true;
     public boolean atTargetAngle = true;
@@ -174,7 +171,6 @@ public class Turret {
     }
 
     public double angleToServoPos(double angle) {
-        // technically should limit input range, but will be taken care of somewhere else
         return norm360(angle - CW_LIMIT) / SERVO_MAX_RANGE;
     }
 
