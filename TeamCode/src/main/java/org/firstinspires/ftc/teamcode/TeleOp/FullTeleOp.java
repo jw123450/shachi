@@ -155,7 +155,7 @@ public class FullTeleOp extends OpMode {
         // SHOOTER
         if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) {
             /// below condition is where robot sometimes get stuck trying but failing to shoot
-            if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.latchOpen) {
+            if (shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                 if (singleShot) {
                     /// SINGLE SHOT
                     useManualIntake = false;

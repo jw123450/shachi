@@ -35,7 +35,7 @@ public class Intake {
 
     // motor constants
     public static double INTAKING_POWER = 0.9;
-    public static double INTAKING_TRANSFER_POWER = 0.508;
+    public static double INTAKING_TRANSFER_POWER = 0.65;
     public static double REVERSE_POWER = -0.7;
     public static double IDLE_POWER = 0;
 
