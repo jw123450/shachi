@@ -41,9 +41,9 @@ public class FullTeleOp extends OpMode {
     private RGBLights lights = new RGBLights();
 
     private final double MINIMUM_RPM = 2000;
-    private final double LATCH_OPENING_DELAY = 0.01;
+    private final double LATCH_OPENING_DELAY = 0.45;
     private final double TRANSFER_ONLY_DELAY = 0.03;
-    private final double SINGLE_SHOT_DELAY = 0.5;
+    private final double SINGLE_SHOT_DELAY = 0.3;
     private final double RAPID_FIRE_DELAY = 0.63;
     private final double RGB_ALERT_DELAY = 1.5; // seconds
 
@@ -108,6 +108,7 @@ public class FullTeleOp extends OpMode {
         turret.setBoth(0.5);
         shooter.closeLatch();
         intake.stowIntake();
+        shooter.initHood();
         pinpoint.transferAutoPose(Globals.autoEndPose);
         shooter.autoRPMmode = true;
         lights.setColor(RGBLights.Colors.WHITE);
@@ -127,22 +128,23 @@ public class FullTeleOp extends OpMode {
         drive.operateSimple();
 
         /// REQUEST RAPID FIRE
-        if (gamepad2.leftBumperWasPressed() && !shooter.shooterLatchOpen) {
-//            if (turret.targetInRange) {
-                vinWantsToShoot = true;
-                singleShot = false;
-//            } else {
-//                alertAction(RGBLights.Colors.RED);
-//            }
+        if (gamepad2.leftBumperWasPressed() && useManualIntake) { // useManualIntake means not in middle of shot
+            // get ready to shoot
+            vinWantsToShoot = true;
+            singleShot = false;
+            shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad2.dpadLeftWasPressed() && !shooter.shooterLatchOpen) {
-            if (turret.targetInRange) {
-                vinWantsToShoot = true;
-                singleShot = true;
-            } else {
-                alertAction(RGBLights.Colors.RED);
-            }
+        else if (gamepad2.dpadLeftWasPressed() && useManualIntake) {
+            vinWantsToShoot = true;
+            singleShot = true;
+            shooter.openLatch();
+        }
+
+        if (gamepad2.dpadDownWasPressed() && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+            vinWantsToShoot = false;
+            singleShot = false;
+            shooter.closeLatch();
         }
 
         // more operate loops (ugly to put here, but fixes small bug)
@@ -151,14 +153,15 @@ public class FullTeleOp extends OpMode {
 //        shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) { /// logic might be fried here
-            if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.shooterLatchOpen) {
+        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) {
+            /// below condition is where robot sometimes get stuck trying but failing to shoot
+            if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.latchOpen) {
                 if (singleShot) {
                     /// SINGLE SHOT
                     useManualIntake = false;
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> shooter.openLatch()),
-                            new SleepAction(LATCH_OPENING_DELAY),
+//                            new InstantAction(() -> shooter.openLatch()),
+//                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(SINGLE_SHOT_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
@@ -171,8 +174,8 @@ public class FullTeleOp extends OpMode {
                     /// RAPID FIRE
                     useManualIntake = false;
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> shooter.openLatch()),
-                            new SleepAction(LATCH_OPENING_DELAY),
+//                            new InstantAction(() -> shooter.openLatch()),
+//                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(TRANSFER_ONLY_DELAY),
                             new InstantAction(() -> intake.shootingIntake()),

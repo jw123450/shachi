@@ -21,45 +21,45 @@ public class Shooter {
     // RPM targets
 //    public static double MINIMUM_RPM = 2000;
 //    public static double MAXIMUM_RPM = 4500;
-    public static double IDLE_NEAR_RPM = 1500;
-    public static double IDLE_FAR_RPM = 2000;
+    public static double IDLE_NEAR_RPM = 1800;
+    public static double IDLE_FAR_RPM = 2900;
     public static double AT_RPM_RANGE = 50;
 
     // PID constants
-    public static double kV = 0.000298507; // 1/6000
-    public static double kP = 0.005;
+    public static double kV = 0.000181716; // 1/6000
+    public static double kP = 0.004;
     public static double kS = 0;
 
     // hood angle adjust
-    public static double HOOD_ANGLE_MAX_POS = 0000; // servo pos 0-1
-    public static double HOOD_ANGLE_MIN_POS = 0000;
-    public static double MAX_ANGLE_DEG = 75; // degrees above horizontal
-    public static double MIN_ANGLE_DEG = 25;
+    public static double HOOD_ANGLE_MAX_POS = 0.979;
+    public static double HOOD_ANGLE_MIN_POS = 0.4415;
+    public static double MAX_ANGLE_DEG = 74; // lob, lanch angle in degrees above horizontal
+    public static double MIN_ANGLE_DEG = 43; // laser
 
     // temporary for tuning loop
-    public static double TEMP_LAUNCH_ANGLE = 50;
+    public static double TEMP_LAUNCH_ANGLE = 74;
     public static double TEMP_RPM = 0;
 
     // servo latch
     public static double TUNING_INCREMENT = 0.001;
-    public static double LATCH_OPEN_POS = 0.3;
-    public static double LATCH_CLOSED_POS = 0.2;
+    public static double LATCH_OPEN_POS = 0.077;
+    public static double LATCH_CLOSED_POS = 0.75;
 
     // REGRESSION CONSTANTS
     // from desmos
-    double a1 = 1300;
-    double b1 = 0.0561225;
-    double c1 = 6.1292;
-    double d1 = 1500;
-    double a2 = 15.32632;
-    double b2 = 0.109589;
-    double c2 = 9.73917;
+    double a1 = 1420.82059;
+    double b1 = 0.0490924;
+    double c1 = 5.04933;
+    double d1 = 1769.14042;
+    double a2 = 59.23412;
+    double b2 = -0.022101;
+    double c2 = -0.771555;
 
     // constantly changing variables
     public volatile double targetRPM = 0;
     public volatile double targetHoodAngle = 50;
     private volatile double output = 0;
-    public volatile boolean shooterLatchOpen = false;
+    public volatile boolean latchOpen = false;
     public volatile boolean autoRPMmode = false;
     public volatile boolean atTargetRPM = false;
 
@@ -109,20 +109,22 @@ public class Shooter {
 
         // shooter latch
         if (opmode.gamepad1.y) {
-            incremental(shooterLatch, 1);
+//            incremental(shooterLatch, 1);
+            openLatch();
         } else if (opmode.gamepad1.a) {
-            incremental(shooterLatch, -1);
+//            incremental(shooterLatch, -1);
+            closeLatch();
         }
 
         // hood adjust
-        if (opmode.gamepad1.b) {
-//            hoodAngleAdjust.setPosition(HOOD_ANGLE_MAX_POS);
-            incremental(hoodAngleAdjust, 1);
-        } else if (opmode.gamepad1.x) {
-//            hoodAngleAdjust.setPosition(HOOD_ANGLE_MIN_POS);
-            incremental(hoodAngleAdjust, -1);
-        }
-///        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
+//        if (opmode.gamepad1.b) {
+////            hoodAngleAdjust.setPosition(HOOD_ANGLE_MAX_POS);
+//            incremental(hoodAngleAdjust, 1);
+//        } else if (opmode.gamepad1.x) {
+////            hoodAngleAdjust.setPosition(HOOD_ANGLE_MIN_POS);
+//            incremental(hoodAngleAdjust, -1);
+//        }
+        hoodAngleAdjust.setPosition(targetAngleToServoPos(TEMP_LAUNCH_ANGLE));
 
         opmode.telemetry.addData("hood adjust pos ", hoodAngleAdjust.getPosition());
         opmode.telemetry.addData("latch pos ", shooterLatch.getPosition());
@@ -154,8 +156,8 @@ public class Shooter {
         if (autoRPMmode) {
             if (vinWantsToShoot) {
                 targetRPM = distanceToRPM(dist);
-//                targetHoodAngle = distanceToHoodAngle(dist);
-//                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+                targetHoodAngle = distanceToHoodAngle(dist);
+                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
             } else if (cyclingFarZone) {
                 targetRPM = IDLE_FAR_RPM;
             } else {
@@ -302,12 +304,16 @@ public class Shooter {
 
     public void openLatch() {
         shooterLatch.setPosition(LATCH_OPEN_POS);
-        shooterLatchOpen = true;
+        latchOpen = true;
     }
 
     public void closeLatch() {
         shooterLatch.setPosition(LATCH_CLOSED_POS);
-        shooterLatchOpen = false;
+        latchOpen = false;
+    }
+
+    public void initHood() {
+        hoodAngleAdjust.setPosition(HOOD_ANGLE_MAX_POS);
     }
 
     public double distanceToRPM(double distance) {
