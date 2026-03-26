@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
@@ -17,18 +18,21 @@ public class IntakeDrive extends OpMode{
     private Intake intake = new Intake();
     private MecanumDrive drive = new MecanumDrive();
     private RobotHardware robotHardware = new RobotHardware();
+    private PinpointManager pinpoint = new PinpointManager();
 
     @Override
     public void init() {
         robotHardware.initialize(this);
         intake.initialize(this, robotHardware);
         drive.initialize(this, robotHardware);
+        pinpoint.initialize(this, robotHardware);
     }
 
     @Override
     public void loop() {
         drive.operateSimple();
-        intake.operateSimple(true);
+        intake.operateTeleOp(true);
+        pinpoint.operateTrackingPose();
         // dpad_up: incremental -
         // dpad_down: incremental +
         // A: stow (after changing values and loading onto bot)
@@ -36,5 +40,10 @@ public class IntakeDrive extends OpMode{
 
         // POWER TESTING
         // joystick: variable power
+
+        telemetry.addLine("\nPOSE");
+        telemetry.addData("pp X", pinpoint.X);
+        telemetry.addData("pp Y", pinpoint.Y);
+        telemetry.addData("pp heading (deg)", pinpoint.normalizedHeading);
     }
 }

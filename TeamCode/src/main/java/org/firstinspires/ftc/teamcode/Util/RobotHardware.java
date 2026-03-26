@@ -69,10 +69,6 @@ public class RobotHardware {
 
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
-//        intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
-//        middleBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "middleBreak");
-//        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
-
         intakeBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "intakeBreak");
         transferBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "transferBreak");
         intakeBreakBeam.setMode(DigitalChannel.Mode.INPUT);
@@ -81,9 +77,9 @@ public class RobotHardware {
 
         rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 
-//        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
-//        limelight.pipelineSwitch(0);
-//
+        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+
 //        opmode.telemetry.setMsTransmissionInterval(11);
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "fl");
@@ -105,10 +101,10 @@ public class RobotHardware {
         RGBIndicatorL = opmode.hardwareMap.get(Servo.class, "lightL");
         RGBIndicatorR = opmode.hardwareMap.get(Servo.class, "lightR");
 
-        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         ShooterR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         ShooterL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);

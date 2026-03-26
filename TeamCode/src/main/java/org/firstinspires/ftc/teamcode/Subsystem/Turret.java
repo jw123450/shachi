@@ -118,21 +118,24 @@ public class Turret {
 //        opmode.telemetry.addData("target in turret range?", targetInRange);
     }
 
-    public void operateSWMSimple(double x_dist, double y_dist, double chassisNormalizedHeading) {
+    public void operateSWMSimple(double adj_x_dist, double adj_y_dist, double chassisNormalizedHeading, boolean vinWantsToShoot) {
         double currentAngle = rightServoEnc.getCurrentTurretAngle();
 
-        double true_target_heading = Math.toDegrees(Math.atan2(y_dist, x_dist));
+        double true_target_heading = Math.toDegrees(Math.atan2(adj_y_dist, adj_x_dist));
         turretTargetAngle = normalize(true_target_heading - chassisNormalizedHeading);
 
         targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
-        if (targetInRange) { // in code-limited range
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
+        atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
+
+        if (vinWantsToShoot && targetInRange) { // in code-limited range
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
             turretTargetAngle = 180;
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            setBoth(angleToServoPos(turretTargetAngle));
         }
 
         opmode.telemetry.addLine("\nTURRET");

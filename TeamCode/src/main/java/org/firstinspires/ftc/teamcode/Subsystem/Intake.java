@@ -166,13 +166,14 @@ public class Intake {
         intakeMotor.setPower(targetIntakePower);
         transferMotor.setPower(targetTransferPower);
 
+//        opmode.telemetry.addLine("\nIntake");
 //        opmode.telemetry.addData("intake timer ms", intakeTimer.milliseconds());
 //        opmode.telemetry.addData("transfer timer ms", transferTimer.milliseconds());
 //        opmode.telemetry.addData("intakeReading", intakeReading);
 //        opmode.telemetry.addData("transferReading", transferReading);
-        opmode.telemetry.addData("intakeFull", intakeFull);
-        opmode.telemetry.addData("transferFull", transferFull);
-        opmode.telemetry.addData("isFull", isFull);
+//        opmode.telemetry.addData("intakeFull", intakeFull);
+//        opmode.telemetry.addData("transferFull", transferFull);
+//        opmode.telemetry.addData("isFull", isFull);
     }
 
     ///  asfadsfsdafadsfasdfasaxfaasdf

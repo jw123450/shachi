@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystem.Turret;
 import org.firstinspires.ftc.teamcode.Util.Globals;
+import org.firstinspires.ftc.teamcode.Util.LimelightVision;
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RGBLights;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
@@ -35,7 +37,7 @@ public class FullTeleOp extends OpMode {
     private Intake intake = new Intake();
     private Turret turret = new Turret();
     private MecanumDrive drive = new MecanumDrive();
-//    private LimelightVision llVision = new LimelightVision();
+    private LimelightVision llVision = new LimelightVision();
     private Shooter shooter = new Shooter();
     private PinpointManager pinpoint = new PinpointManager();
     private RGBLights lights = new RGBLights();
@@ -59,7 +61,7 @@ public class FullTeleOp extends OpMode {
         pinpoint.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
         drive.initialize(this, robotHardware);
-//        llVision.initialize(this, robotHardware);
+        llVision.initialize(this, robotHardware);
         shooter.initialize(this, robotHardware);
         turret.initialize(this, robotHardware);
         lights.initialize(this, robotHardware);
@@ -148,9 +150,9 @@ public class FullTeleOp extends OpMode {
         }
 
         // more operate loops (ugly to put here, but fixes small bug)
-        turret.operateBasic(pinpoint.X, pinpoint.Y, pinpoint.normalizedHeading, blueAlliance, vinWantsToShoot);
-        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
-//        shootWhileMoveCalcsSimple();
+//        turret.operateBasic(pinpoint.X, pinpoint.Y, pinpoint.normalizedHeading, blueAlliance, vinWantsToShoot);
+//        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
+        shootWhileMoveCalcsSimple();
 
         // SHOOTER
         if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) {
@@ -190,31 +192,34 @@ public class FullTeleOp extends OpMode {
         }
 
         intake.operateTeleOp(useManualIntake);
+        if (intake.isFull) {
+            alertAction(RGBLights.Colors.GREEN);
+        }
 
         // Reset functions
-//        if (gamepad1.left_trigger > 0.8) {
-//            // limelight pose reset
-//            llVision.trackPose(blueAlliance);
-//            if (llVision.tagSeen) {
-//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-//                if (gamepad1.yWasPressed()) {
-//                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-//                        alertAction(RGBLights.Colors.YELLOW);
-//                    } else {
-//                        pinpoint.teleOpAprilTagReset(currentLLPose);
-//                        alertAction(RGBLights.Colors.GREEN);
-//                    }
-//                }
-//                telemetry.addData("LL X", currentLLPose.getX());
-//                telemetry.addData("LL Y", currentLLPose.getY());
-//            }
-//
-//            // manual pinpoint heading reset
-//            if (gamepad1.bWasPressed()) {
-//                pinpoint.teleOpResetHeading();
-//                alertAction(RGBLights.Colors.GREEN);
-//            }
-//        }
+        if (gamepad1.left_trigger > 0.8) {
+            // limelight pose reset
+            llVision.trackPose(blueAlliance);
+            if (llVision.tagSeen) {
+                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
+                if (gamepad1.yWasPressed()) {
+                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+                        alertAction(RGBLights.Colors.YELLOW);
+                    } else {
+                        pinpoint.teleOpAprilTagReset(currentLLPose);
+                        alertAction(RGBLights.Colors.GREEN);
+                    }
+                }
+                telemetry.addData("LL X", currentLLPose.getX());
+                telemetry.addData("LL Y", currentLLPose.getY());
+            }
+
+            // manual pinpoint heading reset
+            if (gamepad1.bWasPressed()) {
+                pinpoint.teleOpResetHeading();
+                alertAction(RGBLights.Colors.GREEN);
+            }
+        }
 
         // toggling idle RPM
         if (gamepad1.xWasPressed()) {
@@ -325,4 +330,41 @@ public class FullTeleOp extends OpMode {
             }
         }
     }
+
+        private void shootWhileMoveCalcsSimple() {
+        double temp_time = elapsedtime.milliseconds();
+
+        double currentXDist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - pinpoint.X;
+        double currentYDist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - pinpoint.Y;
+
+        double currentDist = Math.hypot(currentXDist, currentYDist);
+
+        telemetry.addLine("\n=== SHOOT WHILE MOVE CALCS ===");
+
+        if (Math.abs(pinpoint.velX) < 0.1 && Math.abs(pinpoint.velY) < 0.1) {
+            shooter.operateSWMSimple(currentXDist, currentYDist, vinWantsToShoot, cyclingFarZone);
+            turret.operateSWMSimple(currentXDist, currentYDist, pinpoint.normalizedHeading, vinWantsToShoot);
+
+            telemetry.addLine("0");
+            telemetry.addLine("0");
+            telemetry.addLine("0");
+        }
+        else {
+            double airtime = -0.000012 * Math.pow(currentDist, 2) + 0.0036 * currentDist + 0.43;
+            double adjustedXDist = currentXDist - (pinpoint.velX * airtime);
+            double adjustedYDist = currentYDist - (pinpoint.velY * airtime);
+
+            shooter.operateSWMSimple(adjustedXDist, adjustedYDist, vinWantsToShoot, cyclingFarZone);
+            turret.operateSWMSimple(adjustedXDist, adjustedYDist, pinpoint.normalizedHeading, vinWantsToShoot);
+
+            telemetry.addData("airtime", airtime);
+            telemetry.addData("adjustedXDist", adjustedXDist);
+            telemetry.addData("adjustedYDist", adjustedYDist);
+        }
+
+        telemetry.addData("pinpoint.velX", pinpoint.velX);
+        telemetry.addData("pinpoint.velY", pinpoint.velY);
+        telemetry.addData("processing time taken", elapsedtime.milliseconds() - temp_time);
+    }
+
 }

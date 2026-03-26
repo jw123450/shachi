@@ -113,7 +113,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
 
     public void teleOpAprilTagReset(Pose currentPoseLL) {
         // currentPoseLL is already in pinpoint-style coords.
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() + 3), (currentPoseLL.getY() + 7), AngleUnit.RADIANS, currentPoseLL.getHeading()));
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() + 3), (currentPoseLL.getY()), AngleUnit.RADIANS, currentPoseLL.getHeading()));
     }
 
     public void softResetYaw() {
