@@ -192,9 +192,6 @@ public class FullTeleOp extends OpMode {
         }
 
         intake.operateTeleOp(useManualIntake);
-        if (intake.isFull) {
-            alertAction(RGBLights.Colors.GREEN);
-        }
 
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {
@@ -233,7 +230,11 @@ public class FullTeleOp extends OpMode {
         }
 
         // default to orange or violet when no active alerts
-        if (lights.currentColor == RGBLights.Colors.WHITE) {
+        if (intake.isFull && lights.currentColor != RGBLights.Colors.GREEN) {
+            runningActions.add(new InstantAction(() -> lights.setColor(RGBLights.Colors.GREEN)));
+        } else if (!intake.isFull && lights.currentColor == RGBLights.Colors.GREEN) {
+            runningActions.add(new InstantAction(() -> lights.setColor(RGBLights.Colors.WHITE)));
+        } else if (lights.currentColor == RGBLights.Colors.WHITE) {
             runningActions.add(new InstantAction(() -> lights.setColor(cyclingFarZone ? RGBLights.Colors.VIOLET : RGBLights.Colors.YELLOW)));
         }
 
