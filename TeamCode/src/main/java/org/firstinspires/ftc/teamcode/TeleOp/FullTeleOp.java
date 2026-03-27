@@ -30,19 +30,17 @@ public class FullTeleOp extends OpMode {
 
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
-    private FtcDashboard dash = FtcDashboard.getInstance();
     private List<Action> runningActions = new ArrayList<>();
 
     private RobotHardware robotHardware = new RobotHardware();
     private Intake intake = new Intake();
     private Turret turret = new Turret();
-    private MecanumDrive drive = new MecanumDrive();
-    private LimelightVision llVision = new LimelightVision();
     private Shooter shooter = new Shooter();
-    private PinpointManager pinpoint = new PinpointManager();
+    private MecanumDrive drive = new MecanumDrive();
     private RGBLights lights = new RGBLights();
+    private PinpointManager pinpoint = new PinpointManager();
+    private LimelightVision llVision = new LimelightVision();
 
-    private final double MINIMUM_RPM = 2000;
     private final double LATCH_OPENING_DELAY = 0.45;
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double SINGLE_SHOT_DELAY = 0.3;
@@ -119,13 +117,13 @@ public class FullTeleOp extends OpMode {
     @Override
     public void loop() {
         for (LynxModule hub : allHubs) { hub.clearBulkCache();}
-        // for RR Action execution
+        /// RR Action execution
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) { if (action.run(packet)) { newActions.add(action); } }
         runningActions = newActions;
 
-        // operate loops
+        /// pinpoint + drive operate loops
         pinpoint.operateTrackingPose(); // Changes X and Y to pedro coordinates
         drive.operateSimple();
 
@@ -149,9 +147,7 @@ public class FullTeleOp extends OpMode {
             shooter.closeLatch();
         }
 
-        // more operate loops (ugly to put here, but fixes small bug)
-//        turret.operateBasic(pinpoint.X, pinpoint.Y, pinpoint.normalizedHeading, blueAlliance, vinWantsToShoot);
-//        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
+        /// shooter + turret operate loops
         shootWhileMoveCalcsSimple();
 
         // SHOOTER
