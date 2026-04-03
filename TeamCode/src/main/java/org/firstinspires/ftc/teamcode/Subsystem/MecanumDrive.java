@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -63,6 +64,18 @@ public class MecanumDrive {
 //        }
         driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, opmode.gamepad1.right_stick_button || opmode.gamepad1.left_trigger > 0.3);
 //        opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
+
+        if (opmode.gamepad1.left_trigger > 0.3 && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
+            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        } else if (Fl.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
+            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        }
     }
 
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {

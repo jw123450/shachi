@@ -19,7 +19,7 @@ public class AbsoluteAnalogEncoder implements HardwareDevice {
     }
 
     public double getCurrentTurretAngle() {
-        double newAngle = encoder.getVoltage() * DEG_PER_VOLT - 180.0;
+        double newAngle = normalize(encoder.getVoltage() * DEG_PER_VOLT); // turret faces back, so 0 deg corresponds to both max/min voltage
         vel = (newAngle - lastAngle) / timer.seconds(); // deg/sec
         timer.reset();
         lastAngle = newAngle;
@@ -35,5 +35,11 @@ public class AbsoluteAnalogEncoder implements HardwareDevice {
     @Override
     public String getDeviceType() {
         return "Dawg why would you even call this method";
+    }
+
+    private double normalize(double angle) {
+        while (angle > 180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
     }
 }

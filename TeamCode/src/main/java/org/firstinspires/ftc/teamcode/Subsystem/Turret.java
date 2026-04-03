@@ -14,21 +14,19 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 public class Turret {
     OpMode opmode;
     Servo leftServo, rightServo;
-    AbsoluteAnalogEncoder leftServoEnc;
+    public AbsoluteAnalogEncoder rightServoEnc;
 
-    public static double LEFT_LIMIT = 177.5; // code limit, true 18 inch sizing box limit is 115°
-    public static double RIGHT_LIMIT = -177.5; // code limit
+    public static double CCW_LIMIT = -6; // code limit
+    public static double CW_LIMIT = 6; // code limit
     public static double AT_TARGET_RANGE = 5; // in degrees
+    public static double SERVO_MAX_RANGE = 348;
 
     public static double Kv = 0; /// TODO later
 
-    public static double temp_target = 0;
+    public static double temp_target = 180;
 
     // changing variables
-    private double lastError;
-    ElapsedTime timer = new ElapsedTime();
-    private double output = 0;
-    private double turretTargetAngle = 0;
+    public double turretTargetAngle = 180;
     public boolean targetInRange = true;
     public boolean atTargetAngle = true;
 
@@ -38,49 +36,58 @@ public class Turret {
         this.opmode = opmode;
         this.leftServo = robotHardware.leftTurretServo;
         this.rightServo = robotHardware.rightTurretServo;
-        leftServoEnc = new AbsoluteAnalogEncoder(opmode, robotHardware);
+        rightServoEnc = new AbsoluteAnalogEncoder(opmode, robotHardware);
     }
 
     public void operateTesting(TelemetryPacket packet, double chassisNormalizedHeading) {
-        double currentAngle = leftServoEnc.getCurrentTurretAngle();
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
         double true_target_heading = temp_target;
         turretTargetAngle = normalize(true_target_heading - chassisNormalizedHeading);
 
-        targetInRange = turretTargetAngle > RIGHT_LIMIT && turretTargetAngle < LEFT_LIMIT;
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange && opmode.gamepad1.left_bumper) {
-            setBoth(angleToServoPos(turretTargetAngle - opmode.gamepad1.right_stick_x * Kv));
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+        } else if (opmode.gamepad1.x) {
+            setBoth(0);
+        } else if (opmode.gamepad1.b) {
+            setBoth(1);
+        } else if (opmode.gamepad1.a) {
+            setBoth(0.5);
         }
 
         packet.put("current angle", currentAngle);
         packet.put("assigned pos", leftServo.getPosition());
         packet.put("target angle", turretTargetAngle);
+        opmode.telemetry.addData("chassisNormalizedHeading", chassisNormalizedHeading);
         opmode.telemetry.addData("right stick X", opmode.gamepad1.right_stick_x);
-        opmode.telemetry.addData("current angle", currentAngle);
         opmode.telemetry.addData("R assigned pos", rightServo.getPosition());
         opmode.telemetry.addData("L assigned pos", leftServo.getPosition());
+        opmode.telemetry.addData("current angle", currentAngle);
+        opmode.telemetry.addData("targetInRange", targetInRange);
         opmode.telemetry.addData("target angle", turretTargetAngle);
+        opmode.telemetry.addData("atTargetAngle", atTargetAngle);
         opmode.telemetry.addData("temp_target", temp_target);
     }
 
     public void operateBasic(double currentX, double currentY, double chassisNormalizedHeading, boolean blueAlliance, boolean vinWantsToShoot) {
         // calculate TRUE target heading
-        double currentAngle = leftServoEnc.getCurrentTurretAngle();
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
         double x_dist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - currentX;
         double y_dist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentY;
         double true_target_heading = Math.toDegrees(Math.atan2(y_dist, x_dist));
         turretTargetAngle = normalize(true_target_heading - chassisNormalizedHeading);
 
-        targetInRange = turretTargetAngle > RIGHT_LIMIT && turretTargetAngle < LEFT_LIMIT;
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
-        if (targetInRange && opmode.gamepad1.right_trigger > 0.3) { // in code-limited range
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+        if (vinWantsToShoot && targetInRange) { // in code-limited range
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
-            turretTargetAngle = 0;
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            turretTargetAngle = 180;
+            setBoth(angleToServoPos(turretTargetAngle));
         }
 
         opmode.telemetry.addLine("\nTURRET");
@@ -91,17 +98,17 @@ public class Turret {
 
     /// Keep in mind edge case where the robot is driving bakcwards, and would jump from -180 to 180 repeatedly (fix is increasing range: -200° to 200°)
     public void operateSWM(double turretAdjustedTargetAngle) {
-        double currentAngle = leftServoEnc.getCurrentTurretAngle();
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
         turretTargetAngle = turretAdjustedTargetAngle;
 
-        targetInRange = turretTargetAngle > RIGHT_LIMIT && turretTargetAngle < LEFT_LIMIT;
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange) { // in code-limited range
             /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
-            turretTargetAngle = 0;
+            turretTargetAngle = 180;
             /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         }
 
@@ -111,21 +118,24 @@ public class Turret {
 //        opmode.telemetry.addData("target in turret range?", targetInRange);
     }
 
-    public void operateSWMSimple(double x_dist, double y_dist, double chassisNormalizedHeading) {
-        double currentAngle = leftServoEnc.getCurrentTurretAngle();
+    public void operateSWMSimple(double adj_x_dist, double adj_y_dist, double chassisNormalizedHeading, boolean vinWantsToShoot) {
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
 
-        double true_target_heading = Math.toDegrees(Math.atan2(y_dist, x_dist));
+        double true_target_heading = Math.toDegrees(Math.atan2(adj_y_dist, adj_x_dist));
         turretTargetAngle = normalize(true_target_heading - chassisNormalizedHeading);
 
-        targetInRange = turretTargetAngle > RIGHT_LIMIT && turretTargetAngle < LEFT_LIMIT;
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
-        if (targetInRange) { // in code-limited range
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
+        atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
+
+        if (vinWantsToShoot && targetInRange) { // in code-limited range
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         }
         else { // out of code limited range, or vincent doesn't wanna shoot, so default to center
-            turretTargetAngle = 0;
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            turretTargetAngle = 180;
+            setBoth(angleToServoPos(turretTargetAngle));
         }
 
         opmode.telemetry.addLine("\nTURRET");
@@ -135,19 +145,19 @@ public class Turret {
 
     public void operateAuto(double currentX, double currentY, double pedroHeadingDegrees, boolean blueAlliance, boolean runTurret) {
         // calculate TRUE target heading
-        double currentAngle = leftServoEnc.getCurrentTurretAngle();
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
         double x_dist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - currentX;
         double y_dist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentY;
         double true_target_heading = Math.toDegrees(Math.atan2(y_dist, x_dist));
         turretTargetAngle = normalize(true_target_heading - normalize(pedroHeadingDegrees));
 
-        targetInRange = turretTargetAngle > RIGHT_LIMIT && turretTargetAngle < LEFT_LIMIT;
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
         if (targetInRange && runTurret) { // in code-limited range
             /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         } else { // out of code limited range, so default to center
-            turretTargetAngle = 0;
+            turretTargetAngle = 180;
             /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
         }
 
@@ -163,13 +173,8 @@ public class Turret {
         rightServo.setPosition(pos);
     }
 
-    public double getAssignedTurretAngle() { // relative to bot
-        return 355*(leftServo.getPosition() - 0.5);
-    }
-
     public double angleToServoPos(double angle) {
-        // technically should limit input range, but will be taken care of somewhere else
-        return (angle / 355) + 0.5;
+        return norm360(angle - CW_LIMIT) / SERVO_MAX_RANGE;
     }
 
     private double normalize(double angle) {
@@ -178,4 +183,9 @@ public class Turret {
         return angle;
     }
 
+    private double norm360(double angle) {
+        while (angle > 360) angle -= 360;
+        while (angle < 0) angle += 360;
+        return angle;
+    }
 }

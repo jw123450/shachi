@@ -81,15 +81,15 @@ public class LimelightVision {
 //        }
 //    }
 
-    public double readDistance() {
-
-        double targetOffsetVA = -this.ty;
-
-        double angleToGoalDegrees = llMountAngle + targetOffsetVA;
-        double angleToGoalRads = angleToGoalDegrees * (Math.PI / 180);
-
-        return (targetHeight - llMountHeight) / Math.tan(angleToGoalRads);
-    }
+//    public double readDistance() {
+//
+//        double targetOffsetVA = -this.ty;
+//
+//        double angleToGoalDegrees = llMountAngle + targetOffsetVA;
+//        double angleToGoalRads = angleToGoalDegrees * (Math.PI / 180);
+//
+//        return (targetHeight - llMountHeight) / Math.tan(angleToGoalRads);
+//    }
 
     public double getTx() {
         return tx;

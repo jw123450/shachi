@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystem.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystem.Turret;
 import org.firstinspires.ftc.teamcode.Util.Globals;
+import org.firstinspires.ftc.teamcode.Util.LimelightVision;
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RGBLights;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
@@ -28,23 +30,21 @@ public class FullTeleOp extends OpMode {
 
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
-    private FtcDashboard dash = FtcDashboard.getInstance();
     private List<Action> runningActions = new ArrayList<>();
 
     private RobotHardware robotHardware = new RobotHardware();
     private Intake intake = new Intake();
     private Turret turret = new Turret();
-    private MecanumDrive drive = new MecanumDrive();
-//    private LimelightVision llVision = new LimelightVision();
     private Shooter shooter = new Shooter();
-    private PinpointManager pinpoint = new PinpointManager();
+    private MecanumDrive drive = new MecanumDrive();
     private RGBLights lights = new RGBLights();
+    private PinpointManager pinpoint = new PinpointManager();
+    private LimelightVision llVision = new LimelightVision();
 
-    private final double MINIMUM_RPM = 2000;
-    private final double LATCH_OPENING_DELAY = 0.01;
+    private final double LATCH_OPENING_DELAY = 0.45;
     private final double TRANSFER_ONLY_DELAY = 0.03;
-    private final double SINGLE_SHOT_DELAY = 0.5;
-    private final double RAPID_FIRE_DELAY = 0.63;
+    private final double SINGLE_SHOT_DELAY = 0.3;
+    private final double RAPID_FIRE_DELAY = 0.5;
     private final double RGB_ALERT_DELAY = 1.5; // seconds
 
     private volatile boolean blueAlliance = true;
@@ -59,7 +59,7 @@ public class FullTeleOp extends OpMode {
         pinpoint.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
         drive.initialize(this, robotHardware);
-//        llVision.initialize(this, robotHardware);
+        llVision.initialize(this, robotHardware);
         shooter.initialize(this, robotHardware);
         turret.initialize(this, robotHardware);
         lights.initialize(this, robotHardware);
@@ -105,8 +105,10 @@ public class FullTeleOp extends OpMode {
 
     @Override
     public void start() {
+        turret.setBoth(0.5);
         shooter.closeLatch();
-//        intake.deployIntake();
+        intake.stowIntake();
+        shooter.initHood();
         pinpoint.transferAutoPose(Globals.autoEndPose);
         shooter.autoRPMmode = true;
         lights.setColor(RGBLights.Colors.WHITE);
@@ -115,25 +117,102 @@ public class FullTeleOp extends OpMode {
     @Override
     public void loop() {
         for (LynxModule hub : allHubs) { hub.clearBulkCache();}
-        // for RR Action execution
+        /// RR Action execution
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) { if (action.run(packet)) { newActions.add(action); } }
         runningActions = newActions;
 
-        /// check google slides for controls
-        // ALLIANCE SWITCH
-        if (gamepad2.b) {
-            blueAlliance = false;
-            alertAction(RGBLights.Colors.RED);
-        } else if (gamepad2.x) {
-            blueAlliance = true;
-            alertAction(RGBLights.Colors.BLUE);
-        }
-
-        // operate loops
+        /// pinpoint + drive operate loops
         pinpoint.operateTrackingPose(); // Changes X and Y to pedro coordinates
         drive.operateSimple();
+
+        /// REQUEST RAPID FIRE
+        if ((gamepad2.leftBumperWasPressed() || gamepad1.leftBumperWasPressed()) && useManualIntake) { // useManualIntake means not in middle of shot
+            // get ready to shoot
+            vinWantsToShoot = true;
+            singleShot = false;
+            shooter.openLatch();
+        }
+        /// REQUEST SINGLE SHOT
+        else if ((gamepad1.dpadLeftWasPressed()) && useManualIntake) {
+            vinWantsToShoot = true;
+            singleShot = true;
+            shooter.openLatch();
+        }
+
+        if ((gamepad1.dpadDownWasPressed()) && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+            vinWantsToShoot = false;
+            singleShot = false;
+            shooter.closeLatch();
+        }
+
+        /// shooter + turret operate loops
+        shootWhileMoveCalcsSimple();
+
+        // SHOOTER
+        if (vinWantsToShoot && (!gamepad1.left_bumper || singleShot)) {
+            /// below condition is where robot sometimes get stuck trying but failing to shoot
+            if (shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
+                if (singleShot) {
+                    /// SINGLE SHOT
+                    useManualIntake = false;
+                    runningActions.add(new SequentialAction(
+//                            new InstantAction(() -> shooter.openLatch()),
+//                            new SleepAction(LATCH_OPENING_DELAY),
+                            new InstantAction(() -> intake.runTransferOnly()),
+                            new SleepAction(SINGLE_SHOT_DELAY),
+                            new InstantAction(() -> shooter.closeLatch()),
+                            new InstantAction(() -> intake.idle()),
+                            new InstantAction(() -> useManualIntake = true),
+                            new InstantAction(() -> singleShot = false),
+                            new InstantAction(() -> vinWantsToShoot = false)
+                    ));
+                } else {
+                    /// RAPID FIRE
+                    useManualIntake = false;
+                    runningActions.add(new SequentialAction(
+//                            new InstantAction(() -> shooter.openLatch()),
+//                            new SleepAction(LATCH_OPENING_DELAY),
+                            new InstantAction(() -> intake.runTransferOnly()),
+                            new SleepAction(TRANSFER_ONLY_DELAY),
+                            new InstantAction(() -> intake.shootingIntake()),
+                            new SleepAction(RAPID_FIRE_DELAY),
+                            new InstantAction(() -> shooter.closeLatch()),
+                            new InstantAction(() -> intake.idle()),
+                            new InstantAction(() -> useManualIntake = true),
+                            new InstantAction(() -> vinWantsToShoot = false)
+                    ));
+                }
+            }
+        }
+
+        intake.operateTeleOp(useManualIntake);
+
+        // Reset functions
+        if (gamepad1.left_trigger > 0.8) {
+            // limelight pose reset
+            llVision.trackPose(blueAlliance);
+            if (llVision.tagSeen) {
+                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
+                if (gamepad1.yWasPressed()) {
+                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+                        alertAction(RGBLights.Colors.YELLOW);
+                    } else {
+                        pinpoint.teleOpAprilTagReset(currentLLPose);
+                        alertAction(RGBLights.Colors.GREEN);
+                    }
+                }
+                telemetry.addData("LL X", currentLLPose.getX());
+                telemetry.addData("LL Y", currentLLPose.getY());
+            }
+
+            // manual pinpoint heading reset
+            if (gamepad1.bWasPressed()) {
+                pinpoint.teleOpResetHeading();
+                alertAction(RGBLights.Colors.GREEN);
+            }
+        }
 
         // toggling idle RPM
         if (gamepad1.xWasPressed()) {
@@ -147,110 +226,22 @@ public class FullTeleOp extends OpMode {
         }
 
         // default to orange or violet when no active alerts
-        if (lights.currentColor == RGBLights.Colors.WHITE) {
+        if (intake.isFull && lights.currentColor != RGBLights.Colors.GREEN) {
+            runningActions.add(new InstantAction(() -> lights.setColor(RGBLights.Colors.GREEN)));
+        } else if (!intake.isFull && lights.currentColor == RGBLights.Colors.GREEN) {
+            runningActions.add(new InstantAction(() -> lights.setColor(RGBLights.Colors.WHITE)));
+        } else if (lights.currentColor == RGBLights.Colors.WHITE) {
             runningActions.add(new InstantAction(() -> lights.setColor(cyclingFarZone ? RGBLights.Colors.VIOLET : RGBLights.Colors.YELLOW)));
         }
 
-        /// REQUEST RAPID FIRE
-        if (gamepad1.rightBumperWasPressed() && !shooter.shooterLatchOpen) {
-            if (turret.targetInRange) {
-                vinWantsToShoot = true;
-                singleShot = false;
-            } else {
-                alertAction(RGBLights.Colors.RED);
-            }
+        // ALLIANCE SWITCH
+        if (gamepad2.b) {
+            blueAlliance = false;
+            alertAction(RGBLights.Colors.RED);
+        } else if (gamepad2.x) {
+            blueAlliance = true;
+            alertAction(RGBLights.Colors.BLUE);
         }
-        /// REQUEST SINGLE SHOT
-        else if (gamepad1.dpadLeftWasPressed() && !shooter.shooterLatchOpen) {
-            if (turret.targetInRange) {
-                vinWantsToShoot = true;
-                singleShot = true;
-            } else {
-                alertAction(RGBLights.Colors.RED);
-            }
-        }
-
-        // operate loops (ugly to put here, but fixes small bug)
-        shooter.operateBasic(pinpoint.X, pinpoint.Y, blueAlliance, vinWantsToShoot, cyclingFarZone);
-        turret.operateBasic(pinpoint.X, pinpoint.Y, pinpoint.normalizedHeading, blueAlliance, vinWantsToShoot);
-//        shootWhileMoveCalcsSimple();
-
-        // SHOOTER
-        if (vinWantsToShoot) {
-            if (shooter.atTargetRPM && turret.atTargetAngle && !shooter.shooterLatchOpen) {
-                if (singleShot) {
-                    /// SINGLE SHOT
-                    useManualIntake = false;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> shooter.openLatch()),
-                            new SleepAction(LATCH_OPENING_DELAY),
-                            new InstantAction(() -> intake.runTransferOnly()),
-                            new SleepAction(SINGLE_SHOT_DELAY),
-                            new InstantAction(() -> shooter.closeLatch()),
-                            new InstantAction(() -> intake.idle()),
-                            new InstantAction(() -> useManualIntake = true),
-                            new InstantAction(() -> singleShot = false),
-                            new InstantAction(() -> vinWantsToShoot = false)
-                    ));
-                } else {
-                    /// RAPID FIRE
-                    useManualIntake = false;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> shooter.openLatch()),
-                            new SleepAction(LATCH_OPENING_DELAY),
-                            new InstantAction(() -> intake.runTransferOnly()),
-                            new SleepAction(TRANSFER_ONLY_DELAY),
-                            new InstantAction(() -> intake.intakeFullPower()),
-                            new SleepAction(RAPID_FIRE_DELAY),
-                            new InstantAction(() -> shooter.closeLatch()),
-                            new InstantAction(() -> intake.idle()),
-                            new InstantAction(() -> useManualIntake = true),
-                            new InstantAction(() -> vinWantsToShoot = false)
-                    ));
-                }
-            }
-        }
-
-        // intake logic
-        if (useManualIntake) {
-            if (gamepad1.right_trigger > 0.6 && intake.intakeState != Intake.IntakeState.INTAKING_FULL_POWER) {
-                intake.intakeFullPower();
-            } else if (gamepad1.right_trigger > 0.1 && intake.intakeState != Intake.IntakeState.INTAKING) {
-                intake.intake();
-            } else if (gamepad1.aWasPressed() && intake.intakeState != Intake.IntakeState.REVERSE) {
-                intake.reverse();
-            } else if (gamepad1.aWasReleased() && intake.intakeState == Intake.IntakeState.REVERSE) {
-                intake.idle();
-            } else if (gamepad1.right_trigger <= 0.1 && intake.intakeState != Intake.IntakeState.IDLE && intake.intakeState != Intake.IntakeState.REVERSE) {
-                intake.idle();
-            }
-        }
-        intake.operateTeleOp();
-
-        // Reset functions
-//        if (gamepad1.left_trigger > 0.8) {
-//            // limelight pose reset
-//            llVision.trackPose(blueAlliance);
-//            if (llVision.tagSeen) {
-//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-//                if (gamepad1.yWasPressed()) {
-//                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-//                        alertAction(RGBLights.Colors.YELLOW);
-//                    } else {
-//                        pinpoint.teleOpAprilTagReset(currentLLPose);
-//                        alertAction(RGBLights.Colors.GREEN);
-//                    }
-//                }
-//                telemetry.addData("LL X", currentLLPose.getX());
-//                telemetry.addData("LL Y", currentLLPose.getY());
-//            }
-//
-//            // manual pinpoint heading reset
-//            if (gamepad1.bWasPressed()) {
-//                pinpoint.teleOpResetHeading();
-//                alertAction(RGBLights.Colors.GREEN);
-//            }
-//        }
 
         // manual driver 2 goal pose adjust
         if (gamepad2.right_bumper) {
@@ -336,4 +327,41 @@ public class FullTeleOp extends OpMode {
             }
         }
     }
+
+        private void shootWhileMoveCalcsSimple() {
+        double temp_time = elapsedtime.milliseconds();
+
+        double currentXDist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - pinpoint.X;
+        double currentYDist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - pinpoint.Y;
+
+        double currentDist = Math.hypot(currentXDist, currentYDist);
+
+        telemetry.addLine("\n=== SHOOT WHILE MOVE CALCS ===");
+
+        if (Math.abs(pinpoint.velX) < 0.1 && Math.abs(pinpoint.velY) < 0.1) {
+            shooter.operateSWMSimple(currentXDist, currentYDist, vinWantsToShoot, cyclingFarZone);
+            turret.operateSWMSimple(currentXDist, currentYDist, pinpoint.normalizedHeading, vinWantsToShoot);
+
+            telemetry.addLine("0");
+            telemetry.addLine("0");
+            telemetry.addLine("0");
+        }
+        else {
+            double airtime = -0.000012 * Math.pow(currentDist, 2) + 0.0036 * currentDist + 0.43;
+            double adjustedXDist = currentXDist - (pinpoint.velX * airtime);
+            double adjustedYDist = currentYDist - (pinpoint.velY * airtime);
+
+            shooter.operateSWMSimple(adjustedXDist, adjustedYDist, vinWantsToShoot, cyclingFarZone);
+            turret.operateSWMSimple(adjustedXDist, adjustedYDist, pinpoint.normalizedHeading, vinWantsToShoot);
+
+            telemetry.addData("airtime", airtime);
+            telemetry.addData("adjustedXDist", adjustedXDist);
+            telemetry.addData("adjustedYDist", adjustedYDist);
+        }
+
+        telemetry.addData("pinpoint.velX", pinpoint.velX);
+        telemetry.addData("pinpoint.velY", pinpoint.velY);
+        telemetry.addData("processing time taken", elapsedtime.milliseconds() - temp_time);
+    }
+
 }

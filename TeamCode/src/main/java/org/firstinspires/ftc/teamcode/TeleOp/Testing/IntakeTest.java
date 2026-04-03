@@ -20,10 +20,16 @@ public class IntakeTest extends OpMode{
     public void init() {
         robotHardware.initialize(this);
         intake.initialize(this, robotHardware);
+        robotHardware.shooterLatch.setPosition(0.75);
     }
 
     @Override
     public void loop() {
-        intake.operateTesting();
+        if (gamepad1.left_bumper) {
+            intake.operateTesting();
+        }
+        else {
+            intake.operateTeleOp(true);
+        }
     }
 }

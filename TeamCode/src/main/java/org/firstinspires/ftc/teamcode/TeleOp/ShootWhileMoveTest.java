@@ -44,7 +44,6 @@
 //    private PinpointManager pinpoint = new PinpointManager();
 //    private RGBLights lights = new RGBLights();
 //
-//    private final double MINIMUM_RPM = 2000;
 //    private final double PUSHER_DELAY = 0.5;
 //    private final double RAPID_FIRE_DELAY = 0.63;
 //    private final double RGB_ALERT_DELAY = 1.5; // seconds

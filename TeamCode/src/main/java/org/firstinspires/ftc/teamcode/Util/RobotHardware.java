@@ -24,8 +24,7 @@ public class RobotHardware {
     public Servo hoodAngleAdjust, shooterLatch;
 
     public AnalogInput rightTurretAnalog;
-//    public AnalogInput transferBreakBeam, middleBreakBeam, intakeBreakBeam;
-    public DigitalChannel transferBreakBeam,middleBreakBeam, intakeBreakBeam;
+    public DigitalChannel transferBreakBeam, intakeBreakBeam;
 
     public VoltageSensor battery;
 
@@ -42,9 +41,8 @@ public class RobotHardware {
             SENSORS
             pinpoint            - CHUB i2c 1
             turret analog input - CHUB analog 3
-            break beam transfer - CHUB digital 5
-            break beam middle   - CHUB digital 3
-            break beam intake   - CHUB digital 1
+            intake dist sens   - CHUB digital 0
+            transfer dist sens - CHUB digital 4
 
             MOTOR
             Fl - EHUB0
@@ -59,11 +57,11 @@ public class RobotHardware {
             SERVO
             leftTurretServo  - SHUB 3
             rightTurretServo - SHUB 2
-            hoodAngleAdjust  - SHUB 0
             Intake Servo L   - EHUB 0
             RGB light L      - EHUB 5
             Intake Servo R   - CHUB 5
             shooterLatch     - CHUB 2
+            hoodAngleAdjust  - CHUB 1
             RGB light R      - CHUB 0
 
          */
@@ -71,24 +69,17 @@ public class RobotHardware {
 
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
-//        intakeBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "intakeBreak");
-//        middleBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "middleBreak");
-//        transferBreakBeam = opmode.hardwareMap.get(AnalogInput.class, "transferBreak");
-
         intakeBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "intakeBreak");
-        middleBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "middleBreak");
         transferBreakBeam = opmode.hardwareMap.get(DigitalChannel.class, "transferBreak");
         intakeBreakBeam.setMode(DigitalChannel.Mode.INPUT);
-        middleBreakBeam.setMode(DigitalChannel.Mode.INPUT);
         transferBreakBeam.setMode(DigitalChannel.Mode.INPUT);
         /// telemetry.addData("intake beam state", intakeBreakBeam.getState())
-        /// boolean beamBroken = !intakeBreakBeam.getState();
 
         rightTurretAnalog = opmode.hardwareMap.get(AnalogInput.class, "turretAnalog");
 
-//        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
-//        limelight.pipelineSwitch(0);
-//
+        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+
 //        opmode.telemetry.setMsTransmissionInterval(11);
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "fl");
@@ -110,10 +101,10 @@ public class RobotHardware {
         RGBIndicatorL = opmode.hardwareMap.get(Servo.class, "lightL");
         RGBIndicatorR = opmode.hardwareMap.get(Servo.class, "lightR");
 
-        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         ShooterR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         ShooterL.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
