@@ -199,7 +199,7 @@ public class FullTeleOp extends OpMode {
                     if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
                         alertAction(RGBLights.Colors.YELLOW);
                     } else {
-                        pinpoint.teleOpAprilTagReset(currentLLPose);
+                        pinpoint.teleOpAprilTagReset(currentLLPose, (llVision.getTag() == 24));
                         alertAction(RGBLights.Colors.GREEN);
                     }
                 }

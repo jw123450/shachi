@@ -60,9 +60,9 @@ public class RobotHardware {
             Intake Servo L   - EHUB 0
             RGB light L      - EHUB 5
             Intake Servo R   - CHUB 5
-            shooterLatch     - CHUB 2
-            hoodAngleAdjust  - CHUB 1
-            RGB light R      - CHUB 0
+            shooterLatch     - CHUB 1
+            hoodAngleAdjust  - CHUB 0
+            RGB light R      - CHUB 2
 
          */
         battery = opmode.hardwareMap.voltageSensor.iterator().next();

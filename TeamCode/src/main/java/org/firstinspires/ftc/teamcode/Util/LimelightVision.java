@@ -69,6 +69,10 @@ public class LimelightVision {
         }
     }
 
+    public int getTag() {
+        return apriltag;
+    }
+
 //    public double getTargetAngle() {
 //        // Using relative heading + offset
 //        if (tx < 0) {
