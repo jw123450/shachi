@@ -47,10 +47,10 @@ public class Shooter {
 
     // REGRESSION CONSTANTS
     // from desmos
-    double a1 = 1420.82059;
-    double b1 = 0.0490924;
-    double c1 = 5.04933;
-    double d1 = 1719.14042;
+    double a1 = 1777.36447;
+    double b1 = 0.0260802;
+    double c1 = 2.78414;
+    double d1 = 1619.40379;
     double a2 = 59.23412;
     double b2 = -0.022101;
     double c2 = -0.771555;
@@ -262,7 +262,7 @@ public class Shooter {
 //        opmode.telemetry.addData("calculated RPM", distanceToRPM(dist));
     }
 
-    public void operateOdomAuto(double currentX, double currentY, boolean blueAlliance, boolean runShooter, boolean farZone) {
+    public void operateAuto(double currentX, double currentY, boolean blueAlliance, boolean runShooter, boolean farZone) {
         /// alsjdfasdfa
     }
 

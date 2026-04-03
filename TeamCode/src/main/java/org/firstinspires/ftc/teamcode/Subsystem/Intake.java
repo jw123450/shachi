@@ -176,43 +176,47 @@ public class Intake {
 //        opmode.telemetry.addData("isFull", isFull);
     }
 
-    ///  asfadsfsdafadsfasdfasaxfaasdf
-//        if (intake.intakeState == Intake.IntakeState.IDLE) {
-//            if (currentMagState != Spindexer.MagState.FULL) {
-//                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
-//                    // start intaking
-//                    runningActions.add(new InstantAction(() -> intake.intake()));
-//                }
-//            }
-//            else if (currentMagState == Spindexer.MagState.FULL) {
-//                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
-//                    // start intaking
-//                    runningActions.add(new SequentialAction(
-//                            new InstantAction(() -> intake.reverse()),
-//                            new SleepAction(0.7),
-//                            new InstantAction(() -> intake.idle())
-//                    ));
-//                }
-//            }
-//        } else if (intake.intakeState == Intake.IntakeState.INTAKING) {
-//            if (currentMagState != Spindexer.MagState.FULL) {
-//                // keep trying to intake unless driver presses button
-//                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
-//                    // flip up stop intaking
-//                    runningActions.add(new InstantAction(() -> intake.idle()));
-//                }
-//            } else if (intake.chamberState != COLOR_TO_REJECT) {
-//                // yay grabbed 3 balls, can stow now
-//                runningActions.add(new SequentialAction(
-//                        new InstantAction(() -> gamepad1.rumble(400)), // still massive delay?
-//                        new InstantAction(() -> intake.reverse()),
-//                        new SleepAction(0.7),
-//                        new InstantAction(() -> intake.idle())
-//                ));
-//            }
-//        } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
-//            // nothing, will never be in this state for an indefinite time
-//        }
+    public void operateAuto() {
+        /// breakbeams
+        boolean intakeReading = intakeBreakBeam.getState();
+        boolean transferReading = transferBreakBeam.getState();
+
+        // state changed -> start debounce timer
+        if (intakeReading != intakeFull) {
+            if (intakeTimer.milliseconds() > INTAKE_DEBOUNCE_DELAY) {
+                intakeFull = intakeReading;
+                intakeTimer.reset();
+            }
+        } else {
+            // reset timer if sensors match confirmed state
+            intakeTimer.reset();
+        }
+
+        if (transferReading != transferFull) {
+            if (transferTimer.milliseconds() > TRANSFER_DEBOUNCE_DELAY) {
+                transferFull = transferReading;
+                transferTimer.reset();
+            }
+        } else {
+            // reset timer if sensors match confirmed state
+            transferTimer.reset();
+        }
+
+        isFull = intakeFull && transferFull;
+
+        intakeMotor.setPower(targetIntakePower);
+        transferMotor.setPower(targetTransferPower);
+
+//        opmode.telemetry.addLine("\nIntake");
+//        opmode.telemetry.addData("intake timer ms", intakeTimer.milliseconds());
+//        opmode.telemetry.addData("transfer timer ms", transferTimer.milliseconds());
+//        opmode.telemetry.addData("intakeReading", intakeReading);
+//        opmode.telemetry.addData("transferReading", transferReading);
+//        opmode.telemetry.addData("intakeFull", intakeFull);
+//        opmode.telemetry.addData("transferFull", transferFull);
+//        opmode.telemetry.addData("isFull", isFull);
+    }
+
 
 
     // intake helper methods
