@@ -23,6 +23,7 @@ public class Intake {
 
 
     public enum IntakeState {
+        SHOOTING,
         INTAKING,
         REVERSE,
         IDLE
@@ -205,7 +206,11 @@ public class Intake {
         isFull = intakeFull && transferFull;
 
         intakeMotor.setPower(targetIntakePower);
-        transferMotor.setPower(targetTransferPower);
+        if (transferFull && intakeState != IntakeState.SHOOTING) { /// could be wrong logic here
+            transferMotor.setPower(IDLE_POWER);
+        } else {
+            transferMotor.setPower(targetTransferPower);
+        }
 
 //        opmode.telemetry.addLine("\nIntake");
 //        opmode.telemetry.addData("intake timer ms", intakeTimer.milliseconds());
@@ -227,7 +232,7 @@ public class Intake {
         targetTransferPower = power;
     }
     public void shootingIntake() {
-        intakeState = IntakeState.INTAKING;
+        intakeState = IntakeState.SHOOTING;
         setIntake(INTAKING_POWER);
         setTransfer(INTAKING_POWER);
     }
@@ -247,7 +252,7 @@ public class Intake {
         setTransfer(IDLE_POWER);
     }
     public void runTransferOnly() {
-        intakeState = IntakeState.INTAKING;
+        intakeState = IntakeState.SHOOTING;
         setIntake(IDLE_POWER);
         setTransfer(INTAKING_POWER);
     }

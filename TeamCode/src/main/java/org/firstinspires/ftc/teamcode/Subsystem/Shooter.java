@@ -263,7 +263,42 @@ public class Shooter {
     }
 
     public void operateAuto(double currentX, double currentY, boolean blueAlliance, boolean runShooter, boolean farZone) {
-        /// alsjdfasdfa
+        double currentRPM = getCurrentRPM();
+        // calculate distance
+        double x_dist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - currentX;
+        double y_dist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentY;
+        double dist = Math.hypot(x_dist, y_dist);
+
+        if (autoRPMmode) {
+            if (runShooter) {
+                targetRPM = distanceToRPM(dist);
+                targetHoodAngle = distanceToHoodAngle(dist);
+                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+            } else if (farZone) {
+                targetRPM = IDLE_FAR_RPM;
+            } else {
+                targetRPM = IDLE_NEAR_RPM;
+            }
+        }
+
+        output = update(currentRPM);
+
+        // kill switch
+        if (opmode.gamepad2.y) {
+            autoRPMmode = false;
+            output = 0;
+            targetRPM = 0;
+        }
+
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
+
+        atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
+
+        opmode.telemetry.addLine("\nSHOOTER");
+        opmode.telemetry.addData("dist", dist);
+        opmode.telemetry.addData("shooter targetRPM", targetRPM);
+        opmode.telemetry.addData("shooter currentRPM", currentRPM);
     }
 
     public double update(double currentRPM) {

@@ -154,11 +154,12 @@ public class Turret {
         targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
-        if (targetInRange && runTurret) { // in code-limited range
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
-        } else { // out of code limited range, so default to center
+        if (runTurret && targetInRange) { // in code-limited range
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+        }
+        else { // out of code limited range, or doesn't wanna shoot, so default to center
             turretTargetAngle = 180;
-            /// adfsadfasdfadsfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfas
+            setBoth(angleToServoPos(turretTargetAngle));
         }
 
         opmode.telemetry.addLine("TURRET TELEMETRY");
