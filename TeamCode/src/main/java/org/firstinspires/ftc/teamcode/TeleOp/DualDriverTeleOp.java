@@ -25,8 +25,8 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(name = "Full Teleop SINGLE DRIVER", group = "A")
-public class FullTeleOp extends OpMode {
+@TeleOp(name = "Full Teleop DUAL DRIVER", group = "B")
+public class DualDriverTeleOp extends OpMode {
 
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
@@ -53,7 +53,6 @@ public class FullTeleOp extends OpMode {
     private volatile boolean vinWantsToShoot = false;
     private volatile boolean cyclingFarZone = false;
     private volatile boolean singleShot = false;
-    private volatile boolean continuousShot = false;
 
     @Override
     public void init() {
@@ -130,37 +129,21 @@ public class FullTeleOp extends OpMode {
         drive.operateSimple();
 
         /// REQUEST RAPID FIRE
-        if (gamepad1.leftBumperWasPressed() && useManualIntake) { // useManualIntake means not in middle of shot
+        if (gamepad2.leftBumperWasPressed() && !gamepad2.right_bumper && useManualIntake) { // useManualIntake means not in middle of shot
             // get ready to shoot
             vinWantsToShoot = true;
             singleShot = false;
-            continuousShot = false;
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad1.dpadLeftWasPressed() && useManualIntake) {
+        else if (gamepad2.dpadLeftWasPressed() && !gamepad2.right_bumper && useManualIntake) {
             vinWantsToShoot = true;
             singleShot = true;
-            continuousShot = false;
-            shooter.openLatch();
-        /// REQUEST CONTINUOUS SHOOTING
-        } else if (gamepad1.dpadRightWasPressed() && !vinWantsToShoot) {
-            vinWantsToShoot = true;
-            singleShot = false;
-            continuousShot = true;
             shooter.openLatch();
         }
-
-        if (gamepad1.dpadDownWasPressed() && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+        if (gamepad2.dpadDownWasPressed() && !gamepad2.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
             vinWantsToShoot = false;
             singleShot = false;
-            continuousShot = false;
-            shooter.closeLatch();
-        } else if (gamepad1.dpadRightWasReleased() && vinWantsToShoot && continuousShot) {
-            vinWantsToShoot = false;
-            singleShot = false;
-            continuousShot = false;
-            useManualIntake = true;
             shooter.closeLatch();
         }
 
@@ -168,7 +151,7 @@ public class FullTeleOp extends OpMode {
         shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot && (!gamepad1.left_bumper || singleShot || continuousShot)) {
+        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) {
             /// below condition is where robot sometimes get stuck trying but failing to shoot
             if (shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                 if (singleShot) {
@@ -185,8 +168,6 @@ public class FullTeleOp extends OpMode {
                             new InstantAction(() -> singleShot = false),
                             new InstantAction(() -> vinWantsToShoot = false)
                     ));
-                } else if (continuousShot) {
-                    /// CONTINUOUS SHOT
                 } else {
                     /// RAPID FIRE
                     useManualIntake = false;
@@ -303,7 +284,6 @@ public class FullTeleOp extends OpMode {
         packet.put("currentRPM", shooter.getCurrentRPM());
         packet.put("targetRPM", shooter.targetRPM);
         dash.sendTelemetryPacket(packet);
-
         telemetry.addLine("\nPOSE");
         telemetry.addData("pp X", pinpoint.X);
         telemetry.addData("pp Y", pinpoint.Y);
@@ -351,7 +331,7 @@ public class FullTeleOp extends OpMode {
         }
     }
 
-        private void shootWhileMoveCalcsSimple() {
+    private void shootWhileMoveCalcsSimple() {
         double temp_time = elapsedtime.milliseconds();
 
         double currentXDist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - pinpoint.X;

@@ -244,7 +244,7 @@ public class Shooter {
         output = update(currentRPM);
 
         // kill switch
-        if (opmode.gamepad2.y) {
+        if (opmode.gamepad2.right_bumper && opmode.gamepad2.y) {
             autoRPMmode = false;
             output = 0;
             targetRPM = 0;
