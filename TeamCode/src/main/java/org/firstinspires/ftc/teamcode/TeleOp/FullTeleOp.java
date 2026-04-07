@@ -206,7 +206,7 @@ public class FullTeleOp extends OpMode {
             }
         }
 
-        intake.operateTeleOp(useManualIntake);
+        intake.operateTeleOp(useManualIntake, continuousShot);
 
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {

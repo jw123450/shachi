@@ -31,7 +31,7 @@ public class IntakeDrive extends OpMode{
     @Override
     public void loop() {
         drive.operateSimple();
-        intake.operateTeleOp(true);
+        intake.operateTeleOp(true, false);
         pinpoint.operateTrackingPose();
         // dpad_up: incremental -
         // dpad_down: incremental +

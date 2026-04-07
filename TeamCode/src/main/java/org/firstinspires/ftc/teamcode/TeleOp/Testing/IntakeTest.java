@@ -29,7 +29,7 @@ public class IntakeTest extends OpMode{
             intake.operateTesting();
         }
         else {
-            intake.operateTeleOp(true);
+            intake.operateTeleOp(true, false);
         }
     }
 }

@@ -53,6 +53,7 @@ public class DualDriverTeleOp extends OpMode {
     private volatile boolean vinWantsToShoot = false;
     private volatile boolean cyclingFarZone = false;
     private volatile boolean singleShot = false;
+    private volatile boolean continuousShot = false;
 
     @Override
     public void init() {
@@ -133,17 +134,34 @@ public class DualDriverTeleOp extends OpMode {
             // get ready to shoot
             vinWantsToShoot = true;
             singleShot = false;
+            continuousShot = false;
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
         else if (gamepad2.dpadLeftWasPressed() && !gamepad2.right_bumper && useManualIntake) {
             vinWantsToShoot = true;
             singleShot = true;
+            continuousShot = false;
             shooter.openLatch();
         }
+        /// REQUEST CONTINUOUS SHOOTING
+        else if (gamepad2.dpadRightWasPressed() && !vinWantsToShoot) {
+            vinWantsToShoot = true;
+            singleShot = false;
+            continuousShot = true;
+            shooter.openLatch();
+        }
+
+
         if (gamepad2.dpadDownWasPressed() && !gamepad2.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
             vinWantsToShoot = false;
             singleShot = false;
+            shooter.closeLatch();
+        } else if (gamepad1.dpadRightWasReleased() && vinWantsToShoot && continuousShot) {
+            vinWantsToShoot = false;
+            singleShot = false;
+            continuousShot = false;
+            useManualIntake = true;
             shooter.closeLatch();
         }
 
@@ -151,7 +169,7 @@ public class DualDriverTeleOp extends OpMode {
         shootWhileMoveCalcsSimple();
 
         // SHOOTER
-        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot)) {
+        if (vinWantsToShoot && (!gamepad2.left_bumper || singleShot || continuousShot)) {
             /// below condition is where robot sometimes get stuck trying but failing to shoot
             if (shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                 if (singleShot) {
@@ -168,6 +186,8 @@ public class DualDriverTeleOp extends OpMode {
                             new InstantAction(() -> singleShot = false),
                             new InstantAction(() -> vinWantsToShoot = false)
                     ));
+                } else if (continuousShot) {
+                    /// CONTINUOUS SHOT
                 } else {
                     /// RAPID FIRE
                     useManualIntake = false;
@@ -187,7 +207,7 @@ public class DualDriverTeleOp extends OpMode {
             }
         }
 
-        intake.operateTeleOp(useManualIntake);
+        intake.operateTeleOp(useManualIntake, continuousShot);
 
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {

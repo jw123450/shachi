@@ -113,7 +113,7 @@ public class Intake {
         }
     }
 
-    public void operateTeleOp(boolean useManualIntake) {
+    public void operateTeleOp(boolean useManualIntake, boolean continuousShot) {
         /// breakbeams
         boolean intakeReading = intakeBreakBeam.getState();
         boolean transferReading = transferBreakBeam.getState();
@@ -144,7 +144,7 @@ public class Intake {
         /// intake + transfer logic
         if (useManualIntake) {
             if (opmode.gamepad1.right_trigger > 0.2) {
-                if (transferFull) { runIntakeOnly(); }
+                if (transferFull && !continuousShot) { runIntakeOnly(); }
                 else { intakingIntake(); }
             } else if (opmode.gamepad1.aWasPressed() && intakeState != IntakeState.REVERSE) {
                 reverse();
