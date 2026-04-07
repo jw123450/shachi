@@ -145,7 +145,7 @@ public class DualDriverTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST CONTINUOUS SHOOTING
-        else if (gamepad2.dpadRightWasPressed() && !vinWantsToShoot) {
+        else if (gamepad2.dpadRightWasPressed() && !gamepad2.right_bumper && !vinWantsToShoot) {
             vinWantsToShoot = true;
             singleShot = false;
             continuousShot = true;

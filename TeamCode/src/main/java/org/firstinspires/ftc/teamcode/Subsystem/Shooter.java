@@ -42,8 +42,8 @@ public class Shooter {
 
     // servo latch
     public static double TUNING_INCREMENT = 0.001;
-    public static double LATCH_OPEN_POS = 0.05;
-    public static double LATCH_CLOSED_POS = 0.75;
+    public static double LATCH_OPEN_POS = 0.001;
+    public static double LATCH_CLOSED_POS = 0.46;
 
     // REGRESSION CONSTANTS
     // from desmos
