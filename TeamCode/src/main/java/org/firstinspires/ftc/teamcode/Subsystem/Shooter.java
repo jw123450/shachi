@@ -43,7 +43,7 @@ public class Shooter {
     // servo latch
     public static double TUNING_INCREMENT = 0.001;
     public static double LATCH_OPEN_POS = 0.001;
-    public static double LATCH_CLOSED_POS = 0.46;
+    public static double LATCH_CLOSED_POS = 0.5;
 
     // REGRESSION CONSTANTS
     // from desmos
@@ -269,26 +269,17 @@ public class Shooter {
         double y_dist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentY;
         double dist = Math.hypot(x_dist, y_dist);
 
-        if (autoRPMmode) {
-            if (runShooter) {
-                targetRPM = distanceToRPM(dist);
-                targetHoodAngle = distanceToHoodAngle(dist);
-                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
-            } else if (farZone) {
-                targetRPM = IDLE_FAR_RPM;
-            } else {
-                targetRPM = IDLE_NEAR_RPM;
-            }
+        if (runShooter) {
+            targetRPM = distanceToRPM(dist);
+            targetHoodAngle = distanceToHoodAngle(dist);
+            hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+        } else if (farZone) {
+            targetRPM = IDLE_FAR_RPM;
+        } else {
+            targetRPM = IDLE_NEAR_RPM;
         }
 
         output = update(currentRPM);
-
-        // kill switch
-        if (opmode.gamepad2.y) {
-            autoRPMmode = false;
-            output = 0;
-            targetRPM = 0;
-        }
 
         ShooterR.setPower(output);
         ShooterL.setPower(output);

@@ -73,7 +73,7 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose grab789PoseBlue  = new Pose(24.2,66.5, Math.toRadians(270));
 ///                                    turnTo 190 deg here
     private final Pose scoreGatePoseBlue= new Pose(60, 73, Math.toRadians(190));
-    private final Pose grabGatePoseBlue = new Pose(15.8, 60, Math.toRadians(160));
+    private final Pose grabGatePoseBlue = new Pose(15.8, 62, Math.toRadians(157));
 //    private final Pose grabGateControlPointBlue = new Pose(0, 0, 0);
     private final Pose parkPoseBlue     = new Pose(58, 72, Math.toRadians(225));
 
@@ -213,9 +213,9 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             /// GRAB S1 (456)
             case 3: // TODO test diff condition
-                if (follower.atPose(blueAlliance ? grab456PoseBlue : grab456PoseRed, AT_POSE_X_TOL, AT_POSE_Y_TOL) || intake.isFull) {
+                if (!follower.isBusy() || intake.isFull) {
                     intake.idle();
-                    runShooter = true;
+//                    runShooter = true;
                     follower.followPath(blueAlliance ? BScore456 : RScore456, true);
                     setPathState(4);
                 }
@@ -229,23 +229,24 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             case 5:
                 if (!shooter.latchOpen && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
-                    runShooter = false;
+//                    runShooter = false;
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab789 : RGrab789, true);
-                    setPathState(6);
+                    setPathState(7);
                 }
                 break;
             /// GRAB S2 (789)
             case 6: // TODO test diff condition
-                if (follower.atPose(blueAlliance ? grab789PoseBlue : grab789PoseRed, AT_POSE_X_TOL, AT_POSE_Y_TOL) || intake.isFull) {
+                if (!follower.isBusy()) {
                     intake.idle();
-                    follower.turnTo(blueAlliance ? scoreGatePoseBlue.getHeading() : scoreGatePoseRed.getHeading());
+//                    follower.turnTo(blueAlliance ? scoreGatePoseBlue.getHeading() : scoreGatePoseRed.getHeading());
                     setPathState(7);
                 }
                 break;
             // TURN IN PLACE
             case 7:
-                if (!follower.isTurning()) {
+                if (!follower.isBusy()) {
+                    intake.idle();
                     shooter.openLatch();
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore789 : RScore789, true);
@@ -277,7 +278,7 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             // WAIT UNTIL INTAKE FULL OR TIME LIMIT PASSED
             case 11:
-                if (pathTimer.getElapsedTime() > WAIT_GATE_DELAY || intake.isFull) {
+                if (pathTimer.getElapsedTimeSeconds() > WAIT_GATE_DELAY || intake.isFull) {
                     intake.idle();
                     intake.stowIntake();
                     shooter.openLatch();
@@ -402,11 +403,13 @@ public class TwentyOneBallNear extends OpMode {
         Pose currentPose = follower.getPose();
 
         // loops
+        lights.operateAuto(); // rainbow strobe (can change endpoint colors and speed)
+        autonomousPathUpdate();
+
         intake.operateAuto();
         shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone);
         turret.operateAuto(currentPose.getX(), currentPose.getY(), Math.toDegrees(currentPose.getHeading()), blueAlliance, runTurret);
-        lights.operateAuto(); // rainbow strobe (can change endpoint colors and speed)
-        autonomousPathUpdate();
+
 
         // Feedback to Driver Hub for debugging
         telemetry.addLine("STATE TELEMETRY");

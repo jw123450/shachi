@@ -206,6 +206,7 @@ public class Intake {
         isFull = intakeFull && transferFull;
 
         intakeMotor.setPower(targetIntakePower);
+
         if (transferFull && intakeState != IntakeState.SHOOTING) { /// could be wrong logic here
             transferMotor.setPower(IDLE_POWER);
         } else {
