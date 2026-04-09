@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,10 +17,11 @@ public class Turret {
     Servo leftServo, rightServo;
     public AbsoluteAnalogEncoder rightServoEnc;
 
-    public static double CCW_LIMIT = -6; // code limit
-    public static double CW_LIMIT = 6; // code limit
+    public static double CCW_LIMIT = -10.6443; // code limit
+    public static double CW_LIMIT = 6.9486; // code limit
     public static double AT_TARGET_RANGE = 5; // in degrees
-    public static double SERVO_MAX_RANGE = 348;
+    public static double SERVO_MAX_RANGE = 342.4071;
+    public static double TUNING_INCREMENT = 0.001;
 
     public static double Kv = 0; /// TODO later
 
@@ -37,6 +39,10 @@ public class Turret {
         this.leftServo = robotHardware.leftTurretServo;
         this.rightServo = robotHardware.rightTurretServo;
         rightServoEnc = new AbsoluteAnalogEncoder(opmode, robotHardware);
+        leftServo.scaleRange(0, 0.976);
+        rightServo.scaleRange(0, 0.976);
+//        ((PwmControl) leftServo).setPwmRange(new PwmControl.PwmRange(500, 24000));
+//        ((PwmControl) rightServo).setPwmRange(new PwmControl.PwmRange(500, 24000));
     }
 
     public void operateTesting(TelemetryPacket packet, double chassisNormalizedHeading) {
@@ -49,13 +55,25 @@ public class Turret {
 
         if (targetInRange && opmode.gamepad1.left_bumper) {
             setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
-        } else if (opmode.gamepad1.x) {
-            setBoth(0);
-        } else if (opmode.gamepad1.b) {
-            setBoth(1);
-        } else if (opmode.gamepad1.a) {
+        }
+//        else if (opmode.gamepad1.x) {
+//            setBoth(0);
+//        }
+//        else if (opmode.gamepad1.b) {
+//            setBoth(1);
+//        }
+        else if (opmode.gamepad1.a) {
             setBoth(0.5);
         }
+
+        if (opmode.gamepad1.dpad_left) {
+            incremental(leftServo,1);
+            incremental(rightServo,1);
+        } else if (opmode.gamepad1.dpad_right) {
+            incremental(leftServo,-1);
+            incremental(rightServo,-1);
+        }
+
 
         packet.put("current angle", currentAngle);
         packet.put("assigned pos", leftServo.getPosition());
@@ -189,4 +207,11 @@ public class Turret {
         while (angle < 0) angle += 360;
         return angle;
     }
+
+    public void incremental(Servo s, int sign) {
+        s.setPosition(s.getPosition() + sign * TUNING_INCREMENT);
+    }
+
+    // 24000 -> 0.959183
+
 }
