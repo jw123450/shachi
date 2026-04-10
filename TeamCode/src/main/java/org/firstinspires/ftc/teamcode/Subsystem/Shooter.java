@@ -20,7 +20,7 @@ public class Shooter {
 
     // RPM targets
 //    public static double MINIMUM_RPM = 2000;
-//    public static double MAXIMUM_RPM = 4500;
+//    public static double MAXIMUM_RPM = 3500;
     public static double IDLE_NEAR_RPM = 1800;
     public static double IDLE_FAR_RPM = 2900;
     public static double AT_RPM_RANGE = 50;
@@ -47,13 +47,15 @@ public class Shooter {
 
     // REGRESSION CONSTANTS
     // from desmos
-    double a1 = 1777.36447;
-    double b1 = 0.0260802;
-    double c1 = 2.78414;
-    double d1 = 1619.40379;
-    double a2 = 59.23412;
-    double b2 = -0.022101;
-    double c2 = -0.771555;
+    double a1 = 2356.91298;
+    double b1 = 0.0241839;
+    double c1 = 3.44382;
+    double d1 = 1654.90645;
+
+    double a2 = -0.0000219884;
+    double b2 = 0.00782227;
+    double c2 = -0.98952;
+    double d2 = 98.59522;
 
     // constantly changing variables
     public volatile double targetRPM = 0;
@@ -343,11 +345,11 @@ public class Shooter {
     }
 
     public double distanceToRPM(double distance) {
-        return (a1 / (1 + Math.exp(-(b1 * distance - c1)))) + d1;//regression equation
+        return (a1 / (1 + Math.exp(-(b1 * distance - c1)))) + d1; //regression equation
     }
 
     public double distanceToHoodAngle(double distance) {
-        double angle = (a2 / (1 + Math.exp(-(b2 * distance - c2)))) + MIN_ANGLE_DEG;// regression equation
+        double angle = a2 * Math.pow(distance, 3) + b2 * Math.pow(distance, 2) + c2 * distance + d2;// regression equation
 
         return Math.max(Math.min(MAX_ANGLE_DEG, angle), MIN_ANGLE_DEG);
     }
