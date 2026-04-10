@@ -31,7 +31,7 @@ public class Intake {
 
     // servo constants
     public static double INTAKE_STOW = 0.023;
-    public static double INTAKE_DEPLOY = 0.32;
+    public static double INTAKE_DEPLOY = 0.34;
     public static double TUNING_INCREMENT = 0.001;
 
     // motor constants

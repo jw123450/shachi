@@ -118,6 +118,12 @@ public class FullTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        long startTime = System.currentTimeMillis();
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+
         for (LynxModule hub : allHubs) { hub.clearBulkCache();}
         /// RR Action execution
         TelemetryPacket packet = new TelemetryPacket();
@@ -285,7 +291,41 @@ public class FullTeleOp extends OpMode {
             }
         }
 
+        telemetry.addLine("\nPOSE");
+        telemetry.addData("pp X", pinpoint.X);
+        telemetry.addData("pp Y", pinpoint.Y);
+        telemetry.addData("pp heading (deg)", pinpoint.normalizedHeading);
+        telemetry.addData("frequency (Hz)", pinpoint.getFreq());
+        telemetry.addData("looptimes (ms)", pinpoint.getLT());
+
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
         // telemetry
+        telemetry.addLine("\nRAM");
+        long totalMem = Runtime.getRuntime().totalMemory() / (1024 * 1024); // Convert to MB
+        long freeMem = Runtime.getRuntime().freeMemory() / (1024 * 1024);
+        long usedMem = totalMem - freeMem;
+
+        // Send to telemetry
+        telemetry.addData("Used Memory (MB)", usedMem);
+        telemetry.addData("Free Memory (MB)", freeMem);
+        telemetry.addData("Total Memory (MB)", totalMem);
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+
+
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        while (true) {
+            if (System.currentTimeMillis() - startTime >= Globals.MINIMUM_LOOP_TIME) {
+                break;
+            }
+        }
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+
         telemetry.addLine("\nOTHER");
         telemetry.addLine(blueAlliance ? "BLUE ALLIANCE" : "RED ALLIANCE");
         telemetry.addData("cyclingFarZone", cyclingFarZone);
@@ -302,12 +342,8 @@ public class FullTeleOp extends OpMode {
 //        telemetry.addData("LL Y", currentLLPose.getY());
         packet.put("currentRPM", shooter.getCurrentRPM());
         packet.put("targetRPM", shooter.targetRPM);
-        dash.sendTelemetryPacket(packet);
 
-        telemetry.addLine("\nPOSE");
-        telemetry.addData("pp X", pinpoint.X);
-        telemetry.addData("pp Y", pinpoint.Y);
-        telemetry.addData("pp heading (deg)", pinpoint.normalizedHeading);
+        dash.sendTelemetryPacket(packet);
         elapsedtime.reset();
     }
 

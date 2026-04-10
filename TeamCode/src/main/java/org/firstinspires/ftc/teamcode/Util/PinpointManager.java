@@ -75,8 +75,8 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
 
         velX = odo.getVelX(DistanceUnit.INCH);
         velY = odo.getVelY(DistanceUnit.INCH); // inch/sec
-        velVector = new Vector();
-        velVector.setOrthogonalComponents(velX, velY);
+//        velVector = new Vector();
+//        velVector.setOrthogonalComponents(velX, velY);
 
 //        absoluteHeading = odo.getHeading(AngleUnit.DEGREES);
 //        normalizedHeading = normalize(absoluteHeading);
@@ -128,5 +128,13 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
         while (angle > 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
+    }
+
+    public double getFreq() {
+        return odo.getFrequency();
+    }
+
+    public double getLT() {
+        return odo.getLoopTime() * 1000;
     }
 }

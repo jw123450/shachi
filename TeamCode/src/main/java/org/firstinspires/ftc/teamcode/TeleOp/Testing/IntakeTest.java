@@ -20,7 +20,7 @@ public class IntakeTest extends OpMode{
     public void init() {
         robotHardware.initialize(this);
         intake.initialize(this, robotHardware);
-        robotHardware.shooterLatch.setPosition(0.75);
+//        robotHardware.shooterLatch.setPosition(0.75);
     }
 
     @Override

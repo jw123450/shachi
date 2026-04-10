@@ -39,7 +39,7 @@ public class Turret {
         this.leftServo = robotHardware.leftTurretServo;
         this.rightServo = robotHardware.rightTurretServo;
         rightServoEnc = new AbsoluteAnalogEncoder(opmode, robotHardware);
-        leftServo.scaleRange(0, 0.976);
+        leftServo.scaleRange(0, 0.976); // mathmatically should be 0.9689? (according to chatgpt)
         rightServo.scaleRange(0, 0.976);
 //        ((PwmControl) leftServo).setPwmRange(new PwmControl.PwmRange(500, 24000));
 //        ((PwmControl) rightServo).setPwmRange(new PwmControl.PwmRange(500, 24000));

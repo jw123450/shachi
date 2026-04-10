@@ -54,6 +54,7 @@ public class TwentyOneBallNear extends OpMode {
     private volatile boolean runShooter = false;
     private volatile boolean runTurret = false;
     private volatile boolean cyclingFarZone = false;
+    private volatile boolean currentlyShooting = false;
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double RAPID_FIRE_DELAY = 0.4;
     private final double WAIT_GATE_DELAY = 1.5; // TODO
@@ -66,13 +67,13 @@ public class TwentyOneBallNear extends OpMode {
 
 
     /// BLUE SIDE POSES
-    private final Pose startPoseBlue    = new Pose(31,137.8, Math.toRadians(270));
+    private final Pose startPoseBlue    = new Pose(31,136.8, Math.toRadians(270));
     private final Pose score123PoseBlue = new Pose(27, 106, Math.toRadians(270));
-    private final Pose grab456PoseBlue  = new Pose(24.2, 90.8, Math.toRadians(270));
-    private final Pose score456PoseBlue = new Pose(24.2, 108.7, Math.toRadians(270));
-    private final Pose grab789PoseBlue  = new Pose(24.2,66.5, Math.toRadians(270));
-    private final Pose scoreGatePoseBlue= new Pose(60, 73, Math.toRadians(190));
-    private final Pose grabGatePoseBlue = new Pose(15, 63.5, Math.toRadians(157));
+    private final Pose grab456PoseBlue  = new Pose(21, 91.8, Math.toRadians(270));
+    private final Pose score456PoseBlue = new Pose(23.2, 108.7, Math.toRadians(270));
+    private final Pose grab789PoseBlue  = new Pose(22.7,64.5, Math.toRadians(270));
+    private final Pose scoreGatePoseBlue= new Pose(60.5, 73.5, Math.toRadians(170));
+    private final Pose grabGatePoseBlue = new Pose(15, 62.45, Math.toRadians(152));
 //    private final Pose grabGateControlPointBlue = new Pose(0, 0, 0);
     private final Pose parkPoseBlue     = new Pose(58, 72, Math.toRadians(225));
 
@@ -197,16 +198,18 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             /// SCORE PRELOAD
             case 1:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    currentlyShooting = true;
                     rapidFireAction();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!shooter.latchOpen && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
-                    runShooter = true;
+                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
+//                    runShooter = true;
+                    shooter.closeLatch();
                     intake.intakingIntake();
-                    follower.followPath(blueAlliance ? BGrab456 : RGrab456, true);
+                    follower.followPath(blueAlliance ? BGrab456 : RGrab456, 0.8, true);
                     setPathState(3);
                 }
                 break;
@@ -214,6 +217,8 @@ public class TwentyOneBallNear extends OpMode {
             case 3:
                 if (!follower.isBusy() || intake.isFull) {
                     delayedIdleAction();
+                    openLatchAction();
+//                    intake.idle();
 //                    runShooter = true;
                     follower.followPath(blueAlliance ? BScore456 : RScore456, true);
                     setPathState(4);
@@ -222,14 +227,16 @@ public class TwentyOneBallNear extends OpMode {
             /// SCORE S1 (456)
             case 4:
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                    currentlyShooting = true;
                     rapidFireAction();
                     setPathState(5);
                 }
                 break;
             case 5:
-                if (!shooter.latchOpen && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
+                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
 //                    runShooter = false;
                     intake.intakingIntake();
+                    shooter.closeLatch();
                     follower.followPath(blueAlliance ? BGrab789 : RGrab789, true);
                     setPathState(7);
                 }
@@ -245,7 +252,8 @@ public class TwentyOneBallNear extends OpMode {
             // TURN IN PLACE
             case 7:
                 if (!follower.isBusy()) {
-                    delayedIdleAction();
+//                    delayedIdleAction();
+                    intake.idle();
                     shooter.openLatch();
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore789 : RScore789, true);
@@ -255,13 +263,14 @@ public class TwentyOneBallNear extends OpMode {
             /// SCORE S2 (789)
             case 8:
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                    currentlyShooting = true;
                     rapidFireAction();
                     setPathState(9);
                 }
                 break;
             /// GRAB GATE
             case 9:
-                if (!shooter.latchOpen && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
+                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
                     intake.deployIntake();
                     intake.intakingIntake();
@@ -289,6 +298,7 @@ public class TwentyOneBallNear extends OpMode {
             /// SCORE GATE
             case 12:
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                    currentlyShooting = true;
                     rapidFireAction();
                     setPathState(13);
                 }
@@ -447,8 +457,9 @@ public class TwentyOneBallNear extends OpMode {
                 new SleepAction(TRANSFER_ONLY_DELAY),
                 new InstantAction(() -> intake.shootingIntake()),
                 new SleepAction(RAPID_FIRE_DELAY),
+                new InstantAction(() -> intake.idle()),
                 new InstantAction(() -> shooter.closeLatch()),
-                new InstantAction(() -> intake.idle())
+                new InstantAction(() -> currentlyShooting = false)
         ));
     }
 
@@ -457,5 +468,9 @@ public class TwentyOneBallNear extends OpMode {
                 new SleepAction(0.3),
                 new InstantAction(() -> intake.idle())
         ));
+    }
+
+    private void openLatchAction() {
+        runningActions.add(new InstantAction(() -> shooter.openLatch()));
     }
 }
