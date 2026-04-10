@@ -116,7 +116,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
         if (tag24red) {
             odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() + 3.5), (currentPoseLL.getY() + 3), AngleUnit.RADIANS, currentPoseLL.getHeading()));
         } else {
-            odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() - 1), (currentPoseLL.getY() + 3), AngleUnit.RADIANS, currentPoseLL.getHeading()));
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() - 4), (currentPoseLL.getY()+1), AngleUnit.RADIANS, currentPoseLL.getHeading()));
         }
     }
 
