@@ -48,9 +48,9 @@ public class Shooter {
     // REGRESSION CONSTANTS
     // from desmos
     double a1 = 2356.91298;
-    double b1 = 0.0241839;
+    double b1 = 0.0223839; //old: 0.0241839
     double c1 = 3.44382;
-    double d1 = 1654.90645;
+    double d1 = 1629.90645;
 
     double a2 = -0.0000219884;
     double b2 = 0.00782227;
@@ -238,6 +238,7 @@ public class Shooter {
                 hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
             } else if (cyclingFarZone) {
                 targetRPM = IDLE_FAR_RPM;
+
             } else {
                 targetRPM = IDLE_NEAR_RPM;
             }
