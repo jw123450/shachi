@@ -279,13 +279,10 @@ public class DualDriverTeleOp extends OpMode {
                 microAlert(RGBLights.Colors.BLUE);
             } else if (gamepad2.leftBumperWasPressed()) {
                 // full reset
-                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-//                Globals.blueGoalX = 10.5;
-//                Globals.blueGoalY = 139;
-//                Globals.redGoalX = 134.5;
-//                Globals.redGoalY = 139;
+                Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
+                Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
+                Globals.redGoalX = Globals.PERMANENT_redGoalX;
+                Globals.redGoalY = Globals.PERMANENT_redGoalY;
             }
         }
 
@@ -316,13 +313,10 @@ public class DualDriverTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-//        Globals.blueGoalX = 10.5;
-//        Globals.blueGoalY = 139;
-//        Globals.redGoalX = 134.5;
-//        Globals.redGoalY = 139;
+        Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
+        Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
+        Globals.redGoalX = Globals.PERMANENT_redGoalX;
+        Globals.redGoalY = Globals.PERMANENT_redGoalY;
     }
 
     private void alertAction(RGBLights.Colors alertColor) {
