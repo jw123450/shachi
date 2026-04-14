@@ -145,9 +145,6 @@ public class Turret {
         targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
         atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
 
-        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
-        atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
-
         if (vinWantsToShoot && targetInRange) { // in code-limited range
             setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
         }
@@ -185,6 +182,29 @@ public class Turret {
         opmode.telemetry.addData("turretCurrentAngle ", currentAngle);
         opmode.telemetry.addData("targetInRange?", targetInRange);
         opmode.telemetry.addLine("\n");
+    }
+
+    public void operateSWMAuto(double adj_x_dist, double adj_y_dist, double pedroHeadingDegrees, boolean runTurret) {
+        double currentAngle = rightServoEnc.getCurrentTurretAngle();
+
+        double true_target_heading = Math.toDegrees(Math.atan2(adj_y_dist, adj_x_dist));
+        turretTargetAngle = normalize(true_target_heading - normalize(pedroHeadingDegrees));
+
+        targetInRange = turretTargetAngle <= CCW_LIMIT || turretTargetAngle >= CW_LIMIT;
+        atTargetAngle = Math.abs(currentAngle - turretTargetAngle) < AT_TARGET_RANGE;
+
+        if (runTurret && targetInRange) { // in code-limited range
+            setBoth(angleToServoPos(turretTargetAngle + opmode.gamepad1.right_stick_x * Kv));
+        }
+        else { // out of code limited range, or doesn't wanna shoot, so default to center
+            turretTargetAngle = 180;
+            setBoth(angleToServoPos(turretTargetAngle));
+        }
+
+
+        opmode.telemetry.addLine("\nTURRET");
+        opmode.telemetry.addData("turretTargetAngle", turretTargetAngle);
+        opmode.telemetry.addData("turretCurrentAngle", currentAngle);
     }
 
     public void setBoth(double pos) {

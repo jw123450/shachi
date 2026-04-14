@@ -294,6 +294,34 @@ public class Shooter {
         opmode.telemetry.addData("shooter currentRPM", currentRPM);
     }
 
+    public void operateSWMAuto(double adj_x_dist, double adj_y_dist, boolean blueAlliance, boolean runShooter, boolean farZone) {
+        double currentRPM = getCurrentRPM();
+        // calculate distance
+        double dist = Math.hypot(adj_x_dist, adj_y_dist);
+
+        if (runShooter) {
+            targetRPM = distanceToRPM(dist);
+            targetHoodAngle = distanceToHoodAngle(dist);
+            hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+        } else if (farZone) {
+            targetRPM = IDLE_FAR_RPM;
+        } else {
+            targetRPM = IDLE_NEAR_RPM;
+        }
+
+        output = update(currentRPM);
+
+        ShooterR.setPower(output);
+        ShooterL.setPower(output);
+
+        atTargetRPM = Math.abs(currentRPM - targetRPM) < AT_RPM_RANGE;
+
+        opmode.telemetry.addLine("\nSHOOTER");
+        opmode.telemetry.addData("dist", dist);
+        opmode.telemetry.addData("shooter targetRPM", targetRPM);
+        opmode.telemetry.addData("shooter currentRPM", currentRPM);
+    }
+
     public double update(double currentRPM) {
         double power = (kV * targetRPM) + (kP * (targetRPM - currentRPM));
 

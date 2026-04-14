@@ -11,5 +11,5 @@ public class Globals {
     public static double redGoalX = 143.5; // TODO //old: 140
     public static double redGoalY = 139.5; // TODO //old: 136
     public static boolean blueAlliance = true;
-    public static double MINIMUM_LOOP_TIME = 15;
+    public static double MINIMUM_LOOP_TIME = 11;
 }

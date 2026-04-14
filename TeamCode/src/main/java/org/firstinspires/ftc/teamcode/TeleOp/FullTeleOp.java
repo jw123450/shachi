@@ -284,10 +284,10 @@ public class FullTeleOp extends OpMode {
                 microAlert(RGBLights.Colors.BLUE);
             } else if (gamepad2.leftBumperWasPressed()) {
                 // full reset
-                Globals.blueGoalX = 10.5;
-                Globals.blueGoalY = 139;
-                Globals.redGoalX = 134.5;
-                Globals.redGoalY = 139;
+//                Globals.blueGoalX = 10.5; /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//                Globals.blueGoalY = 139; /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//                Globals.redGoalX = 134.5; /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//                Globals.redGoalY = 139;
             }
         }
 
@@ -349,10 +349,13 @@ public class FullTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        Globals.blueGoalX = 10.5;
-        Globals.blueGoalY = 139;
-        Globals.redGoalX = 134.5;
-        Globals.redGoalY = 139;
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//        Globals.blueGoalX = 10.5;
+//        Globals.blueGoalY = 139;
+//        Globals.redGoalX = 134.5;
+//        Globals.redGoalY = 139;
     }
 
     private void alertAction(RGBLights.Colors alertColor) {
@@ -387,7 +390,7 @@ public class FullTeleOp extends OpMode {
         }
     }
 
-        private void shootWhileMoveCalcsSimple() {
+    private void shootWhileMoveCalcsSimple() {
         double temp_time = elapsedtime.milliseconds();
 
         double currentXDist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - pinpoint.X;

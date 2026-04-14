@@ -23,7 +23,6 @@ public class Intake {
 
 
     public enum IntakeState {
-        SHOOTING,
         INTAKING,
         REVERSE,
         IDLE
@@ -177,7 +176,7 @@ public class Intake {
 //        opmode.telemetry.addData("isFull", isFull);
     }
 
-    public void operateAuto() {
+    public void operateAuto(boolean currentlyShooting) {
         /// breakbeams
         boolean intakeReading = intakeBreakBeam.getState();
         boolean transferReading = transferBreakBeam.getState();
@@ -207,7 +206,7 @@ public class Intake {
 
         intakeMotor.setPower(targetIntakePower);
 
-        if (transferFull && intakeState != IntakeState.SHOOTING) { /// could be wrong logic here
+        if (transferFull && !currentlyShooting) {
             transferMotor.setPower(IDLE_POWER);
         } else {
             transferMotor.setPower(targetTransferPower);
@@ -233,7 +232,7 @@ public class Intake {
         targetTransferPower = power;
     }
     public void shootingIntake() {
-        intakeState = IntakeState.SHOOTING;
+        intakeState = IntakeState.INTAKING;
         setIntake(INTAKING_POWER);
         setTransfer(INTAKING_POWER);
     }
@@ -253,7 +252,7 @@ public class Intake {
         setTransfer(IDLE_POWER);
     }
     public void runTransferOnly() {
-        intakeState = IntakeState.SHOOTING;
+        intakeState = IntakeState.INTAKING;
         setIntake(IDLE_POWER);
         setTransfer(INTAKING_POWER);
     }

@@ -279,10 +279,13 @@ public class DualDriverTeleOp extends OpMode {
                 microAlert(RGBLights.Colors.BLUE);
             } else if (gamepad2.leftBumperWasPressed()) {
                 // full reset
-                Globals.blueGoalX = 10.5;
-                Globals.blueGoalY = 139;
-                Globals.redGoalX = 134.5;
-                Globals.redGoalY = 139;
+                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+                /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//                Globals.blueGoalX = 10.5;
+//                Globals.blueGoalY = 139;
+//                Globals.redGoalX = 134.5;
+//                Globals.redGoalY = 139;
             }
         }
 
@@ -313,10 +316,13 @@ public class DualDriverTeleOp extends OpMode {
 
     @Override
     public void stop() {
-        Globals.blueGoalX = 10.5;
-        Globals.blueGoalY = 139;
-        Globals.redGoalX = 134.5;
-        Globals.redGoalY = 139;
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        /// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+//        Globals.blueGoalX = 10.5;
+//        Globals.blueGoalY = 139;
+//        Globals.redGoalX = 134.5;
+//        Globals.redGoalY = 139;
     }
 
     private void alertAction(RGBLights.Colors alertColor) {
