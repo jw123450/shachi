@@ -38,6 +38,7 @@ public class Intake {
     public static double INTAKING_TRANSFER_POWER = 0.65;
     public static double REVERSE_POWER = -0.7;
     public static double IDLE_POWER = 0;
+    public static double FAR_ZONE_MULTIPLIER = 0.7;
 
     public static double INTAKE_DEBOUNCE_DELAY = 200; // ms
     public static double TRANSFER_DEBOUNCE_DELAY = 80;
@@ -231,10 +232,10 @@ public class Intake {
     public void setTransfer(double power) {
         targetTransferPower = power;
     }
-    public void shootingIntake(float farZoneMultiplier) {
+    public void shootingIntake(boolean farZone) {
         intakeState = IntakeState.INTAKING;
-        setIntake(INTAKING_POWER * farZoneMultiplier);
-        setTransfer(INTAKING_POWER * farZoneMultiplier);
+        setIntake(INTAKING_POWER * (farZone ? FAR_ZONE_MULTIPLIER : 1));
+        setTransfer(INTAKING_POWER * (farZone ? FAR_ZONE_MULTIPLIER: 1));
     }
     public void intakingIntake() {
         intakeState = IntakeState.INTAKING;

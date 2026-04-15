@@ -139,14 +139,14 @@ public class DualDriverTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad2.right_bumper && useManualIntake) {
+        else if (gamepad2.dpad_left && !gamepad2.right_bumper && useManualIntake) {
             vinWantsToShoot = true;
             singleShot = true;
             continuousShot = false;
-            shooter.openLatch();
+//            shooter.openLatch();
         }
         /// REQUEST CONTINUOUS SHOOTING
-        else if (gamepad2.right_trigger>0.8 && !gamepad2.right_bumper && !vinWantsToShoot) {
+        else if (gamepad2.right_trigger > 0.8 && !gamepad2.right_bumper && !vinWantsToShoot) {
             vinWantsToShoot = true;
             singleShot = false;
             continuousShot = true;
@@ -158,7 +158,7 @@ public class DualDriverTeleOp extends OpMode {
             vinWantsToShoot = false;
             singleShot = false;
             shooter.closeLatch();
-        } else if (gamepad1.dpadRightWasReleased() && vinWantsToShoot && continuousShot) {
+        } else if (gamepad2.right_trigger < 0.8 && vinWantsToShoot && continuousShot) {
             vinWantsToShoot = false;
             singleShot = false;
             continuousShot = false;
@@ -177,8 +177,8 @@ public class DualDriverTeleOp extends OpMode {
                     /// SINGLE SHOT
                     useManualIntake = false;
                     runningActions.add(new SequentialAction(
-//                            new InstantAction(() -> shooter.openLatch()),
-//                            new SleepAction(LATCH_OPENING_DELAY),
+                            new InstantAction(() -> shooter.openLatch()),
+                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(SINGLE_SHOT_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
@@ -197,7 +197,7 @@ public class DualDriverTeleOp extends OpMode {
 //                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(TRANSFER_ONLY_DELAY),
-                            new InstantAction(() -> intake.shootingIntake(farZoneMultiplier)),
+                            new InstantAction(() -> intake.shootingIntake(cyclingFarZone)),
                             new SleepAction(RAPID_FIRE_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
                             new InstantAction(() -> intake.idle()),

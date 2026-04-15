@@ -54,7 +54,6 @@ public class FullTeleOp extends OpMode {
     private volatile boolean cyclingFarZone = false;
     private volatile boolean singleShot = false;
     private volatile boolean continuousShot = false;
-    private volatile float farZoneMultiplier = 1;
 
     @Override
     public void init() {
@@ -202,7 +201,7 @@ public class FullTeleOp extends OpMode {
 //                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(TRANSFER_ONLY_DELAY),
-                            new InstantAction(() -> intake.shootingIntake(farZoneMultiplier)),
+                            new InstantAction(() -> intake.shootingIntake(cyclingFarZone)),
                             new SleepAction(RAPID_FIRE_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
                             new InstantAction(() -> intake.idle()),
@@ -241,13 +240,6 @@ public class FullTeleOp extends OpMode {
         }
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {
-            // limelight pose reset
-//            llVision.trackPose(blueAlliance);
-//            if (llVision.tagSeen) {
-//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-//                telemetry.addData("LL X", currentLLPose.getX());
-//                telemetry.addData("LL Y", currentLLPose.getY());
-//            }
 
             // manual pinpoint heading reset
             if (gamepad1.bWasPressed()) {
@@ -261,11 +253,9 @@ public class FullTeleOp extends OpMode {
             if (cyclingFarZone) { // toggle from far to near
                 cyclingFarZone = false;
                 alertAction(RGBLights.Colors.YELLOW);
-                farZoneMultiplier = 1;
             } else { // toggle from near to far
                 cyclingFarZone = true;
                 alertAction(RGBLights.Colors.VIOLET);
-                farZoneMultiplier = 0.7F;
             }
         }
 
