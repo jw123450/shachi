@@ -45,7 +45,7 @@ public class StartPoseChecker extends OpMode {
     private ElapsedTime elapsedtime;
 
     private RobotHardware robotHardware = new RobotHardware();
-    private RGBLights lights = new RGBLights();
+//    private RGBLights lights = new RGBLights();
 
     ///  CONSTANTS
     private boolean blueAlliance = true;
@@ -114,11 +114,7 @@ public class StartPoseChecker extends OpMode {
                     case 2:
                         follower.followPath(blueAlliance ? BFarToMiddle : RFarToMiddle);
                         break;
-                    case 3:
-                        follower.holdPoint(fieldMiddle);
-                        break;
                     default:
-                        follower.holdPoint(fieldMiddle);
                         break;
                 }
                 setPathState(1);
@@ -138,7 +134,7 @@ public class StartPoseChecker extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        lights.initialize(this, robotHardware);
+//        lights.initialize(this, robotHardware);
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -152,13 +148,13 @@ public class StartPoseChecker extends OpMode {
 
     @Override
     public void init_loop() {
-        if (gamepad1.b || gamepad2.b) {
-            blueAlliance = false;
-            lights.setColor(RGBLights.Colors.RED);
-        } else if (gamepad1.x || gamepad2.x) {
-            blueAlliance = true;
-            lights.setColor(RGBLights.Colors.BLUE);
-        }
+//        if (gamepad1.b || gamepad2.b) {
+//            blueAlliance = false;
+//            lights.setColor(RGBLights.Colors.RED);
+//        } else if (gamepad1.x || gamepad2.x) {
+//            blueAlliance = true;
+//            lights.setColor(RGBLights.Colors.BLUE);
+//        }
 
         if (gamepad1.dpadDownWasPressed()) {
             num--;

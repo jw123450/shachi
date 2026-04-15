@@ -62,9 +62,11 @@ public class FarHPCycle extends OpMode {
     private final double DELAY_BEFORE_MOVING = 150; // milliseconds
 
     /// BLUE SIDE
-    private final Pose startPoseBlue = new Pose(54.3,8.3, Math.toRadians(180));
+    /// BLUE 55.8, 7.6, 180
+    /// RED 91.04, 8.09, 0
+    private final Pose startPoseBlue = new Pose(55.8,7.6, Math.toRadians(180));
     private final Pose scorePoseBlue = new Pose(50.5, 11.5, Math.toRadians(180));
-    private final Pose prepGrabS3PoseBlue = new Pose(45, 35.5, Math.toRadians(180));
+    private final Pose prepGrabS3PoseBlue = new Pose(45, 33.5, Math.toRadians(180));
     private final Pose grabS3PoseBlue = new Pose(15, 35.5, Math.toRadians(180));
     private final Pose hpPrepPoseBlueCorner = new Pose(18.5, 8, Math.toRadians(180));
     private final Pose hpGrabPoseBlueCorner = new Pose(12.5, 8, Math.toRadians(180));

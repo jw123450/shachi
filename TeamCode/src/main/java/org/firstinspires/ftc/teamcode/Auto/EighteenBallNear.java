@@ -66,13 +66,15 @@ public class EighteenBallNear extends OpMode {
     private final double AT_POSE_Y_TOL = 2.5;
 
     /// BLUE SIDE POSES
-    private final Pose startPoseBlue    = new Pose(31,136.3, Math.toRadians(270));
+    /// BLUE 31.6.35, 135.08, deg 270
+    /// RED 113.14 ,136.44, deg 270
+    private final Pose startPoseBlue    = new Pose(31.6,135.08, Math.toRadians(270));
     private final Pose score123PoseBlue = new Pose(27, 106, Math.toRadians(270));
     private final Pose grab456PoseBlue  = new Pose(21, 90, Math.toRadians(270));
     private final Pose score456PoseBlue = new Pose(23.2, 108.7, Math.toRadians(270));
     private final Pose grab789PoseBlue  = new Pose(22.7,64.5, Math.toRadians(270));
     private final Pose scoreGatePoseBlue= new Pose(60.5, 73.5, Math.toRadians(170));
-    private final Pose grabGatePoseBlue = new Pose(15, 62.45, Math.toRadians(152));
+    private final Pose grabGatePoseBlue = new Pose(16.3, 59.45, Math.toRadians(150));
 //    private final Pose grabGateControlPointBlue = new Pose(0, 0, 0);
     private final Pose parkPoseBlue     = new Pose(58, 72, Math.toRadians(225));
 
@@ -197,7 +199,7 @@ public class EighteenBallNear extends OpMode {
                 break;
             /// SCORE PRELOAD
             case 1:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && pathTimer.getElapsedTimeSeconds() > 2) {
+                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && pathTimer.getElapsedTimeSeconds() > 1) {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(2);
@@ -207,6 +209,7 @@ public class EighteenBallNear extends OpMode {
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
 //                    runShooter = true;
                     shooter.closeLatch();
+                    closeLatchAction();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab456 : RGrab456, 0.8, true);
                     setPathState(3);
@@ -251,9 +254,10 @@ public class EighteenBallNear extends OpMode {
             // TURN IN PLACE
             case 7:
                 if (!follower.isBusy()) {
-//                    delayedIdleAction();
-                    intake.idle();
-                    shooter.openLatch();
+                    delayedIdleAction();
+//                    intake.idle();
+                    openLatchAction();
+//                    shooter.openLatch();
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore789 : RScore789, true);
                     setPathState(8);
@@ -470,6 +474,14 @@ public class EighteenBallNear extends OpMode {
     }
 
     private void openLatchAction() {
+//        runningActions.add(new InstantAction(() -> shooter.openLatch()));
+        runningActions.add(new SequentialAction(
+                new SleepAction(0.15),
+                new InstantAction(() -> shooter.openLatch())
+        ));
+    }
+
+    private void closeLatchAction() {
         runningActions.add(new InstantAction(() -> shooter.openLatch()));
     }
 }

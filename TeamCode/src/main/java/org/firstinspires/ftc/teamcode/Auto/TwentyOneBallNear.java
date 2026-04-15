@@ -61,26 +61,28 @@ public class TwentyOneBallNear extends OpMode {
     private final double DELAY_BEFORE_MOVING = 50; // milliseconds
 
     /// BLUE SIDE POSES
-    private final Pose startPoseBlue    = new Pose(20,115, Math.toRadians(143)); // TODO measure accurately & test with 72,72 opmode
+    /// BLUE start 21, 118.37, deg 141.16
+    /// RED start 122.93. 119.2, deg 37.45
+    private final Pose startPoseBlue    = new Pose(21,119.37, Math.toRadians(140.2)); // TODO measure accurately & test with 72,72 opmode
     private final Pose score123PoseBlue = new Pose(64,69, Math.toRadians(180));
     private final Pose prepGrab456PoseBlue = new Pose(40.8, 60, Math.toRadians(180));
     private final Pose grab456PoseBlue  = new Pose(17,60, Math.toRadians(180));
     private final Pose score456PoseBlue = new Pose(60.5,73.5, Math.toRadians(170));
-    private final Pose grab789PoseBlue  = new Pose(15,62.45, Math.toRadians(152));
-    private final Pose score789PoseBlue = new Pose(60.5,73.5, Math.toRadians(170));
+    private final Pose grab789PoseBlue  = new Pose(16.3, 59.45, Math.toRadians(150));
+    private final Pose score789PoseBlue = new Pose(61.5,73.5, Math.toRadians(170));
     private final Pose grab101112PoseBlue  = grab789PoseBlue;
     private final Pose score101112PoseBlue = score789PoseBlue;
     private final Pose grab131415PoseBlue  = grab789PoseBlue;
     private final Pose score131415PoseBlue = score789PoseBlue;
     private final Pose prepGrab161718HeadingBlue = new Pose(0,0, Math.toRadians(262));
-    private final Pose grab161718PoseBlue  = new Pose(17,35.4, Math.toRadians(180));
-    private final Pose grab161718ControlPose1Blue = new Pose(55.4,35.5, 0);
-    private final Pose grab161718ControlPose2Blue = new Pose(49.4,35, 0);
+    private final Pose grab161718PoseBlue  = new Pose(17,36.4, Math.toRadians(180));
+    private final Pose grab161718ControlPose1Blue = new Pose(55.4,36.5, 0);
+    private final Pose grab161718ControlPose2Blue = new Pose(49.4,36, 0);
     private final Pose prepScore161718HeadingBlue = new Pose(0,0, Math.toRadians(238));
-    private final Pose score161718PoseBlue = new Pose(47.7,84.7, Math.toRadians(180));
-    private final Pose grab192021PoseBlue  = new Pose(18,84.5, Math.toRadians(180));
-    private final Pose score192021PoseBlue = new Pose(48,84.5, Math.toRadians(180));
-    private final Pose parkPoseBlue        = new Pose(46,83.5, Math.toRadians(225));
+    private final Pose score161718PoseBlue = new Pose(48.7,84.7, Math.toRadians(180));
+    private final Pose grab192021PoseBlue  = new Pose(20,84.5, Math.toRadians(180));
+    private final Pose score192021PoseBlue = new Pose(49,84.5, Math.toRadians(180));
+    private final Pose parkPoseBlue        = new Pose(47,83.5, Math.toRadians(225));
 
     /// RED SIDE POSES
     private final Pose startPoseRed     = startPoseBlue.mirror();
@@ -278,7 +280,7 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             /// SCORE PRELOAD (123)
             case 1:
-                if (shooter.atTargetRPM && turret.atTargetAngle) {
+                if (shooter.atTargetRPM && turret.atTargetAngle && pathTimer.getElapsedTimeSeconds() > 1) {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(2);
@@ -360,7 +362,7 @@ public class TwentyOneBallNear extends OpMode {
             // OPEN GATE
             case 11:
                 if (!follower.isBusy()) {
-                    setPathState(11);
+                    setPathState(12);
                 }
                 break;
             // WAIT UNTIL INTAKE FULL OR TIME LIMIT PASSED
@@ -371,7 +373,7 @@ public class TwentyOneBallNear extends OpMode {
                     shooter.openLatch();
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore101112 : RScore101112, true);
-                    setPathState(13);
+                    setPathState(14);
                 }
                 break;
             /// SCORE GATE (101112)
@@ -422,6 +424,7 @@ public class TwentyOneBallNear extends OpMode {
             case 19:
                 if (!follower.isTurning() /** might be deep fried */ && !currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
+                    shooter.closeLatch();
                     intake.deployIntake();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab161718 : RGrab161718, true);
@@ -580,9 +583,9 @@ public class TwentyOneBallNear extends OpMode {
         autonomousPathUpdate();
 
         intake.operateAuto(currentlyShooting);
-        shootWhileMoveCalcsSimple(currentPose);
-//        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone);
-//        turret.operateAuto(currentPose.getX(), currentPose.getY(), Math.toDegrees(currentPose.getHeading()), blueAlliance, runTurret);
+//        shootWhileMoveCalcsSimple(currentPose);
+        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone);
+        turret.operateAuto(currentPose.getX(), currentPose.getY(), Math.toDegrees(currentPose.getHeading()), blueAlliance, runTurret);
 
 
         // Feedback to Driver Hub for debugging
