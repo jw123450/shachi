@@ -54,6 +54,7 @@ public class FullTeleOp extends OpMode {
     private volatile boolean cyclingFarZone = false;
     private volatile boolean singleShot = false;
     private volatile boolean continuousShot = false;
+    private volatile float farZoneMultiplier = 1;
 
     @Override
     public void init() {
@@ -201,7 +202,7 @@ public class FullTeleOp extends OpMode {
 //                            new SleepAction(LATCH_OPENING_DELAY),
                             new InstantAction(() -> intake.runTransferOnly()),
                             new SleepAction(TRANSFER_ONLY_DELAY),
-                            new InstantAction(() -> intake.shootingIntake()),
+                            new InstantAction(() -> intake.shootingIntake(farZoneMultiplier)),
                             new SleepAction(RAPID_FIRE_DELAY),
                             new InstantAction(() -> shooter.closeLatch()),
                             new InstantAction(() -> intake.idle()),
@@ -213,6 +214,16 @@ public class FullTeleOp extends OpMode {
         }
 
         intake.operateTeleOp(useManualIntake, continuousShot);
+        llVision.trackPose(blueAlliance);
+        if (llVision.tagSeen && gamepad1.yWasPressed()) {
+            Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
+            if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+                alertAction(RGBLights.Colors.ORANGE);
+            } else {
+                pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+                alertAction(RGBLights.Colors.BLUE);
+            }
+        }
 
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {
@@ -220,14 +231,6 @@ public class FullTeleOp extends OpMode {
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-                if (gamepad1.yWasPressed()) {
-                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-                        alertAction(RGBLights.Colors.ORANGE);
-                    } else {
-                        pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
-                        alertAction(RGBLights.Colors.BLUE);
-                    }
-                }
                 telemetry.addData("LL X", currentLLPose.getX());
                 telemetry.addData("LL Y", currentLLPose.getY());
             }
@@ -244,9 +247,11 @@ public class FullTeleOp extends OpMode {
             if (cyclingFarZone) { // toggle from far to near
                 cyclingFarZone = false;
                 alertAction(RGBLights.Colors.YELLOW);
+                farZoneMultiplier = 1;
             } else { // toggle from near to far
                 cyclingFarZone = true;
                 alertAction(RGBLights.Colors.VIOLET);
+                farZoneMultiplier = 0.7F;
             }
         }
 

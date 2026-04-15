@@ -21,8 +21,8 @@ public class Shooter {
     // RPM targets
 //    public static double MINIMUM_RPM = 2000;
 //    public static double MAXIMUM_RPM = 3500;
-    public static double IDLE_NEAR_RPM = 1800;
-    public static double IDLE_FAR_RPM = 2900;
+    public static double IDLE_NEAR_RPM = 1950;
+    public static double IDLE_FAR_RPM = 2850;
     public static double AT_RPM_RANGE = 50;
 
     // PID constants
@@ -47,8 +47,8 @@ public class Shooter {
 
     // REGRESSION CONSTANTS
     // from desmos
-    double a1 = 2356.91298;
-    double b1 = 0.0223839; //old: 0.0241839
+    double a1 = 2367.91298;
+    double b1 = 0.0231239; //old: 0.0241839
     double c1 = 3.44382;
     double d1 = 1629.90645;
 

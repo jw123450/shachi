@@ -231,10 +231,10 @@ public class Intake {
     public void setTransfer(double power) {
         targetTransferPower = power;
     }
-    public void shootingIntake() {
+    public void shootingIntake(float farZoneMultiplier) {
         intakeState = IntakeState.INTAKING;
-        setIntake(INTAKING_POWER);
-        setTransfer(INTAKING_POWER);
+        setIntake(INTAKING_POWER * farZoneMultiplier);
+        setTransfer(INTAKING_POWER * farZoneMultiplier);
     }
     public void intakingIntake() {
         intakeState = IntakeState.INTAKING;
