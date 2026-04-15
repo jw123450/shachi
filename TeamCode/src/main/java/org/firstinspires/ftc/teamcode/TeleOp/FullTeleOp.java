@@ -225,15 +225,29 @@ public class FullTeleOp extends OpMode {
             }
         }
 
-        // Reset functions
-        if (gamepad1.left_trigger > 0.8) {
-            // limelight pose reset
+        if (gamepad1.yWasPressed()) {
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-                telemetry.addData("LL X", currentLLPose.getX());
-                telemetry.addData("LL Y", currentLLPose.getY());
+//                telemetry.addData("LL X", currentLLPose.getX());
+//                telemetry.addData("LL Y", currentLLPose.getY());
+                if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+                    alertAction(RGBLights.Colors.ORANGE);
+                } else {
+                    pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+                    alertAction(RGBLights.Colors.BLUE);
+                }
             }
+        }
+        // Reset functions
+        if (gamepad1.left_trigger > 0.8) {
+            // limelight pose reset
+//            llVision.trackPose(blueAlliance);
+//            if (llVision.tagSeen) {
+//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
+//                telemetry.addData("LL X", currentLLPose.getX());
+//                telemetry.addData("LL Y", currentLLPose.getY());
+//            }
 
             // manual pinpoint heading reset
             if (gamepad1.bWasPressed()) {

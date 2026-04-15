@@ -139,14 +139,14 @@ public class DualDriverTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad2.dpadLeftWasPressed() && !gamepad2.right_bumper && useManualIntake) {
+        else if (gamepad2.right_bumper && useManualIntake) {
             vinWantsToShoot = true;
             singleShot = true;
             continuousShot = false;
             shooter.openLatch();
         }
         /// REQUEST CONTINUOUS SHOOTING
-        else if (gamepad2.dpadRightWasPressed() && !gamepad2.right_bumper && !vinWantsToShoot) {
+        else if (gamepad2.right_trigger>0.8 && !gamepad2.right_bumper && !vinWantsToShoot) {
             vinWantsToShoot = true;
             singleShot = false;
             continuousShot = true;
@@ -154,7 +154,7 @@ public class DualDriverTeleOp extends OpMode {
         }
 
 
-        if (gamepad2.dpadDownWasPressed() && !gamepad2.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+        if (gamepad1.dpadDownWasPressed() && !gamepad1.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
             vinWantsToShoot = false;
             singleShot = false;
             shooter.closeLatch();
@@ -210,23 +210,37 @@ public class DualDriverTeleOp extends OpMode {
 
         intake.operateTeleOp(useManualIntake, continuousShot);
 
-        // Reset functions
-        if (gamepad1.left_trigger > 0.8) {
-            // limelight pose reset
+        if (gamepad1.yWasPressed()) {
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-                if (gamepad1.yWasPressed()) {
-                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-                        alertAction(RGBLights.Colors.ORANGE);
-                    } else {
-                        pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
-                        alertAction(RGBLights.Colors.BLUE);
-                    }
+//                telemetry.addData("LL X", currentLLPose.getX());
+//                telemetry.addData("LL Y", currentLLPose.getY());
+                if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+                    alertAction(RGBLights.Colors.ORANGE);
+                } else {
+                    pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+                    alertAction(RGBLights.Colors.BLUE);
                 }
-                telemetry.addData("LL X", currentLLPose.getX());
-                telemetry.addData("LL Y", currentLLPose.getY());
             }
+        }
+        // Reset functions
+        if (gamepad1.left_trigger > 0.8) {
+            // limelight pose reset
+//            llVision.trackPose(blueAlliance);
+//            if (llVision.tagSeen) {
+//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
+//                if (gamepad1.yWasPressed()) {
+//                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
+//                        alertAction(RGBLights.Colors.ORANGE);
+//                    } else {
+//                        pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+//                        alertAction(RGBLights.Colors.BLUE);
+//                    }
+//                }
+//                telemetry.addData("LL X", currentLLPose.getX());
+//                telemetry.addData("LL Y", currentLLPose.getY());
+//            }
 
             // manual pinpoint heading reset
             if (gamepad1.bWasPressed()) {

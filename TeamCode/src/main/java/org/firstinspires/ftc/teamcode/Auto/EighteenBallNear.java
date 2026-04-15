@@ -454,7 +454,7 @@ public class EighteenBallNear extends OpMode {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> intake.runTransferOnly()),
                 new SleepAction(TRANSFER_ONLY_DELAY),
-                new InstantAction(() -> intake.shootingIntake()),
+                new InstantAction(() -> intake.shootingIntake(1)),
                 new SleepAction(RAPID_FIRE_DELAY),
                 new InstantAction(() -> intake.idle()),
                 new InstantAction(() -> shooter.closeLatch()),
