@@ -228,7 +228,7 @@ public class EighteenBallNear extends OpMode {
                 break;
             /// SCORE S1 (456)
             case 4:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(5);
@@ -265,7 +265,7 @@ public class EighteenBallNear extends OpMode {
                 break;
             /// SCORE S2 (789)
             case 8:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(9);
@@ -300,7 +300,7 @@ public class EighteenBallNear extends OpMode {
                 break;
             /// SCORE GATE
             case 12:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(13);
@@ -362,6 +362,7 @@ public class EighteenBallNear extends OpMode {
         // set servos for auto
         intake.deployIntake();
         shooter.closeLatch();
+        shooter.initHood();
         lights.setColor(blueAlliance ? RGBLights.Colors.BLUE : RGBLights.Colors.RED);
     }
 
@@ -476,12 +477,12 @@ public class EighteenBallNear extends OpMode {
     private void openLatchAction() {
 //        runningActions.add(new InstantAction(() -> shooter.openLatch()));
         runningActions.add(new SequentialAction(
-                new SleepAction(0.15),
+                new SleepAction(0.3),
                 new InstantAction(() -> shooter.openLatch())
         ));
     }
 
     private void closeLatchAction() {
-        runningActions.add(new InstantAction(() -> shooter.openLatch()));
+        runningActions.add(new InstantAction(() -> shooter.closeLatch()));
     }
 }

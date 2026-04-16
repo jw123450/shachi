@@ -295,7 +295,7 @@ public class Shooter {
         opmode.telemetry.addData("shooter currentRPM", currentRPM);
     }
 
-    public void operateSWMAuto(double adj_x_dist, double adj_y_dist, boolean blueAlliance, boolean runShooter, boolean farZone) {
+    public void operateSWMAuto(double adj_x_dist, double adj_y_dist, boolean runShooter, boolean farZone) {
         double currentRPM = getCurrentRPM();
         // calculate distance
         double dist = Math.hypot(adj_x_dist, adj_y_dist);
@@ -321,6 +321,7 @@ public class Shooter {
         opmode.telemetry.addData("dist", dist);
         opmode.telemetry.addData("shooter targetRPM", targetRPM);
         opmode.telemetry.addData("shooter currentRPM", currentRPM);
+
     }
 
     public double update(double currentRPM) {

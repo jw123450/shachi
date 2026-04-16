@@ -49,12 +49,14 @@ public class FarHPCycle extends OpMode {
     private RGBLights lights = new RGBLights();
 
     ///  CONSTANTS
+    private boolean secondTimeComplete = false;
     private boolean blueAlliance = true;
     private volatile boolean runShooter = false;
     private volatile boolean runTurret = false;
     private volatile boolean currentlyShooting = false;
     private boolean cyclingFarZone = true; // for shooter
     private boolean grabS3 = false;
+    private final double LATCH_OPENING_DELAY = 0.26767;
 
     ///  CONSTANTS
     private final double TRANSFER_ONLY_DELAY = 0.03;
@@ -234,7 +236,7 @@ public class FarHPCycle extends OpMode {
                 cyclingFarZone = true;
                 runShooter = true;
                 runTurret = true;
-                shooter.openLatch();
+                openLatchAction();
                 follower.followPath(blueAlliance ? BScore123 : RScore123, 0.5, true);
                 setPathState(1);
                 break;
@@ -254,7 +256,8 @@ public class FarHPCycle extends OpMode {
             case 100:
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
-                    shooter.closeLatch();
+//                    shooter.closeLatch();
+                    closeLatchAction();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrabS3 : RGrabS3, false);
                     setPathState(101);
@@ -281,7 +284,8 @@ public class FarHPCycle extends OpMode {
             case 2:
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
-                    shooter.closeLatch();
+//                    shooter.closeLatch();
+                    closeLatchAction();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrabHPCorner : RGrabHPCorner, false);
                     setPathState(3);
@@ -308,7 +312,8 @@ public class FarHPCycle extends OpMode {
             case 5:
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
-                    shooter.closeLatch();
+//                    shooter.closeLatch();
+                    closeLatchAction();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrabHPHigh : RGrabHPHigh, false); // TODO
                     setPathState(6);
@@ -335,7 +340,8 @@ public class FarHPCycle extends OpMode {
             case 8:
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
-                    shooter.closeLatch();
+//                    shooter.closeLatch();
+                    closeLatchAction();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrabHPMiddle : RGrabHPMiddle, false); // TODO
                     setPathState(9);
@@ -382,13 +388,17 @@ public class FarHPCycle extends OpMode {
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
                     currentlyShooting = true;
                     rapidFireAction();
-                    if (grabS3) {
+                    if (secondTimeComplete) {
                         /// park
                         setPathState(14);
+                    } else if (grabS3) {
+                        ///  back to grab middle
+                        secondTimeComplete = true;
+                        setPathState(8);
                     } else {
-                        /// run one more cycle
-                        setPathState(11);
-                        grabS3 = true; // kinda goofy, but avoids infinite loop without adding extra variable
+                        /// back to grab high
+                        secondTimeComplete = true;
+                        setPathState(5);
                     }
                 }
                 break;
@@ -438,6 +448,7 @@ public class FarHPCycle extends OpMode {
         // set servos for auto
         intake.deployIntake();
         shooter.closeLatch();
+        shooter.initHood();
         lights.setColor(blueAlliance ? RGBLights.Colors.BLUE : RGBLights.Colors.RED);
     }
 
@@ -528,6 +539,8 @@ public class FarHPCycle extends OpMode {
     // method for rapid firing to reduce
     private void rapidFireAction() {
         runningActions.add(new SequentialAction(
+//                new InstantAction(() -> shooter.openLatch()),
+//                new SleepAction(LATCH_OPENING_DELAY),
                 new InstantAction(() -> intake.runTransferOnly()),
                 new SleepAction(TRANSFER_ONLY_DELAY),
                 new InstantAction(() -> intake.shootingIntake(cyclingFarZone)),
@@ -546,6 +559,12 @@ public class FarHPCycle extends OpMode {
     }
 
     private void openLatchAction() {
-        runningActions.add(new InstantAction(() -> shooter.openLatch()));
+        runningActions.add(new SequentialAction(
+                new SleepAction(0.3),
+                new InstantAction(() -> shooter.openLatch())
+        ));
+    }
+    private void closeLatchAction() {
+        runningActions.add(new InstantAction(() -> shooter.closeLatch()));
     }
 }

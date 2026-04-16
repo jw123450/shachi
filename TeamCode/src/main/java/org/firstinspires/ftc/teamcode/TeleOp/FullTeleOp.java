@@ -42,7 +42,7 @@ public class FullTeleOp extends OpMode {
     private PinpointManager pinpoint = new PinpointManager();
     private LimelightVision llVision = new LimelightVision();
 
-    private final double LATCH_OPENING_DELAY = 0.45;
+    private final double LATCH_OPENING_DELAY = 0.4;
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double SINGLE_SHOT_DELAY = 0.25;
     private final double RAPID_FIRE_DELAY = 0.5;
