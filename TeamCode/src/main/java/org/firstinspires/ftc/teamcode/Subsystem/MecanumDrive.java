@@ -81,7 +81,7 @@ public class MecanumDrive {
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
-        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 1);
+        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 0.8);
         // calculating output
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
