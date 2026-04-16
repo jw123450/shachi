@@ -406,7 +406,7 @@ public class FullTeleOp extends OpMode {
 
         telemetry.addLine("\n=== SHOOT WHILE MOVE CALCS ===");
 
-        if (Math.abs(pinpoint.velX) < 0.1 && Math.abs(pinpoint.velY) < 0.1) {
+        if ((Math.abs(pinpoint.velX) < 0.1 && Math.abs(pinpoint.velY) < 0.1) || continuousShot) {
             shooter.operateSWMSimple(currentXDist, currentYDist, vinWantsToShoot, cyclingFarZone);
             turret.operateSWMSimple(currentXDist, currentYDist, pinpoint.normalizedHeading, vinWantsToShoot);
 
