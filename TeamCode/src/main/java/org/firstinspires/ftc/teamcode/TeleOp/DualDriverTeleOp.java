@@ -139,11 +139,11 @@ public class DualDriverTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad2.dpad_left && !gamepad2.right_bumper && useManualIntake) {
+        else if (gamepad1.dpad_left && !gamepad2.right_bumper && useManualIntake) {
             vinWantsToShoot = true;
             singleShot = true;
             continuousShot = false;
-//            shooter.openLatch();
+            shooter.openLatch();
         }
         /// REQUEST CONTINUOUS SHOOTING
         else if (gamepad2.right_trigger > 0.8 && !gamepad2.right_bumper && !vinWantsToShoot) {
@@ -154,7 +154,7 @@ public class DualDriverTeleOp extends OpMode {
         }
 
 
-        if (gamepad1.dpadDownWasPressed() && !gamepad1.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+        if (gamepad2.dpadDownWasPressed() && !gamepad2.right_bumper && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
             vinWantsToShoot = false;
             singleShot = false;
             shooter.closeLatch();
@@ -220,6 +220,10 @@ public class DualDriverTeleOp extends OpMode {
                     alertAction(RGBLights.Colors.ORANGE);
                 } else {
                     pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+                    Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
+                    Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
+                    Globals.redGoalX = Globals.PERMANENT_redGoalX;
+                    Globals.redGoalY = Globals.PERMANENT_redGoalY;
                     alertAction(RGBLights.Colors.BLUE);
                 }
             }
