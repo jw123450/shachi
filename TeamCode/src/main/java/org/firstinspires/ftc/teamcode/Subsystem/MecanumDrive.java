@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Configurable
+@Config
 public class MecanumDrive {
 
     OpMode opmode;
@@ -24,12 +25,10 @@ public class MecanumDrive {
     public static double SLOW_MODE_FACTOR = 0.5;
     public static double CACHING_THRESHOLD = 0.005; // TODO
 
-    public volatile boolean angleLock = false;
-
-    public static double Kp = 0.0007; // TODO
+    public static double Kp = 0.007; // TODO
     public static double Kd = 0.0001; // TODO
-    public static double BLUE_GATE_HEADING = 150;
-    public static double RED_GATE_HEADING = 30;
+    public static double BLUE_GATE_HEADING = 140;
+    public static double RED_GATE_HEADING = 40;
 
 //    private VoltageSensor battery;
 
@@ -68,7 +67,7 @@ public class MecanumDrive {
 //            readCurrents();
 //            timer.reset();
 //        }
-        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, (opmode.gamepad1.a ? calculatePD(blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING, currentHeading) : opmode.gamepad1.right_stick_x),  opmode.gamepad1.left_trigger > 0.3);
+        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, (opmode.gamepad1.a ? calculatePD((blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING), currentHeading) : opmode.gamepad1.right_stick_x),  opmode.gamepad1.left_trigger > 0.3);
 //        opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
 
         if ((opmode.gamepad1.left_trigger > 0.3 || opmode.gamepad1.a) && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
@@ -165,8 +164,8 @@ public class MecanumDrive {
         double derivative = (error - lastError) / timer.seconds();
 
         double output = (Kp * error) + (Kd * derivative); // TODO maybe need sqrt? (below)
-//        output = Math.signum(output) * Math.sqrt(Math.min(1, Math.abs(output)));
-        output = Math.max(-1, Math.min(1, output));
+        output = Math.signum(output) * Math.sqrt(Math.min(1, Math.abs(output)));
+//        output = Math.max(-1, Math.min(1, output));
 
         // reset stuff for next time
         timer.reset();

@@ -54,7 +54,6 @@ public class DualDriverTeleOp extends OpMode {
     private volatile boolean cyclingFarZone = false;
     private volatile boolean singleShot = false;
     private volatile boolean continuousShot = false;
-    private volatile float farZoneMultiplier = 1;
 
     @Override
     public void init() {
@@ -243,11 +242,9 @@ public class DualDriverTeleOp extends OpMode {
             if (cyclingFarZone) { // toggle from far to near
                 cyclingFarZone = false;
                 alertAction(RGBLights.Colors.YELLOW);
-                farZoneMultiplier = 1;
             } else { // toggle from near to far
                 cyclingFarZone = true;
                 alertAction(RGBLights.Colors.VIOLET);
-                farZoneMultiplier = 0.7F;
             }
         }
 

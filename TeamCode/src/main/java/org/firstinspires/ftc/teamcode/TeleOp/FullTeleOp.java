@@ -119,9 +119,7 @@ public class FullTeleOp extends OpMode {
     @Override
     public void loop() {
         /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
         long startTime = System.currentTimeMillis();
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
         /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
 
         for (LynxModule hub : allHubs) { hub.clearBulkCache();}
@@ -144,20 +142,21 @@ public class FullTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad1.dpadLeftWasPressed() && useManualIntake) {
-            vinWantsToShoot = true;
-            singleShot = true;
-            continuousShot = false;
-            shooter.openLatch();
-        /// REQUEST CONTINUOUS SHOOTING
-        } else if (gamepad1.dpadRightWasPressed() && !vinWantsToShoot) {
+//        else if (gamepad1.dpadLeftWasPressed() && useManualIntake) {
+//            vinWantsToShoot = true;
+//            singleShot = true;
+//            continuousShot = false;
+//            shooter.openLatch();
+//        /// REQUEST CONTINUOUS SHOOTING
+//        }
+        else if (gamepad1.dpadRightWasPressed() && !vinWantsToShoot) {
             vinWantsToShoot = true;
             singleShot = false;
             continuousShot = true;
             shooter.openLatch();
         }
 
-        if (gamepad1.dpadDownWasPressed() && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
+        if (gamepad1.dpadLeftWasPressed() && vinWantsToShoot && useManualIntake) { // cancels shot if bugging
             vinWantsToShoot = false;
             singleShot = false;
             continuousShot = false;
@@ -213,16 +212,7 @@ public class FullTeleOp extends OpMode {
         }
 
         intake.operateTeleOp(useManualIntake, continuousShot);
-        llVision.trackPose(blueAlliance);
-        if (llVision.tagSeen && gamepad1.yWasPressed()) {
-            Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-            if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-                alertAction(RGBLights.Colors.ORANGE);
-            } else {
-                pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
-                alertAction(RGBLights.Colors.BLUE);
-            }
-        }
+//        llVision.trackPose(blueAlliance);
 
         /// Reset functions
         if (gamepad1.dpadDownWasPressed()) {
@@ -308,25 +298,8 @@ public class FullTeleOp extends OpMode {
         telemetry.addData("pp X", pinpoint.X);
         telemetry.addData("pp Y", pinpoint.Y);
         telemetry.addData("pp heading (deg)", pinpoint.normalizedHeading);
-        telemetry.addData("frequency (Hz)", pinpoint.getFreq());
-        telemetry.addData("looptimes (ms)", pinpoint.getLT());
-
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        // telemetry
-        telemetry.addLine("\nRAM");
-        long totalMem = Runtime.getRuntime().totalMemory() / (1024 * 1024); // Convert to MB
-        long freeMem = Runtime.getRuntime().freeMemory() / (1024 * 1024);
-        long usedMem = totalMem - freeMem;
-
-        // Send to telemetry
-        telemetry.addData("Used Memory (MB)", usedMem);
-        telemetry.addData("Free Memory (MB)", freeMem);
-        telemetry.addData("Total Memory (MB)", totalMem);
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
-        /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////
+//        telemetry.addData("frequency (Hz)", pinpoint.getFreq());
+//        telemetry.addData("looptimes (ms)", pinpoint.getLT());
 
 
         /// /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////  /////////

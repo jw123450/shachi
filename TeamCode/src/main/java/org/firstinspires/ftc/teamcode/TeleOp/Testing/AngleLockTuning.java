@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Util.Globals;
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
@@ -24,6 +25,11 @@ public class AngleLockTuning extends OpMode{
         intake.initialize(this, robotHardware);
         drive.initialize(this, robotHardware);
         pinpoint.initialize(this, robotHardware);
+    }
+
+    @Override
+    public void start() {
+        pinpoint.transferAutoPose(Globals.autoEndPose);
     }
 
     @Override
