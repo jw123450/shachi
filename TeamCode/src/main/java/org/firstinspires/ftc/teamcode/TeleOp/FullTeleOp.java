@@ -133,7 +133,7 @@ public class FullTeleOp extends OpMode {
 
         /// pinpoint + drive operate loops
         pinpoint.operateTrackingPose(); // Changes X and Y to pedro coordinates
-        drive.operateSimple();
+        drive.operateTeleOp(pinpoint.normalizedHeading, blueAlliance);
 
         /// REQUEST RAPID FIRE
         if (gamepad1.leftBumperWasPressed() && useManualIntake) { // useManualIntake means not in middle of shot

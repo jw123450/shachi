@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.MecanumDrive;
@@ -74,7 +73,7 @@ public class TurretTest extends OpMode {
 
         pinpoint.operateSimple();
         turret.operateTesting(packet, pinpoint.normalizedHeading);
-        drive.operateSimple();
+        drive.operateTeleOp(pinpoint.normalizedHeading, blueAlliance);
 
         dash.sendTelemetryPacket(packet);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());

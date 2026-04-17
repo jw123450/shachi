@@ -128,7 +128,7 @@ public class DualDriverTeleOp extends OpMode {
 
         /// pinpoint + drive operate loops
         pinpoint.operateTrackingPose(); // Changes X and Y to pedro coordinates
-        drive.operateSimple();
+        drive.operateTeleOp(pinpoint.normalizedHeading, blueAlliance);
 
         /// REQUEST RAPID FIRE
         if (gamepad2.leftBumperWasPressed() && !gamepad2.right_bumper && useManualIntake) { // useManualIntake means not in middle of shot
@@ -210,7 +210,7 @@ public class DualDriverTeleOp extends OpMode {
 
         intake.operateTeleOp(useManualIntake, continuousShot);
 
-        if (gamepad1.yWasPressed()) {
+        if (gamepad1.dpadDownWasPressed()) {
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
@@ -230,6 +230,11 @@ public class DualDriverTeleOp extends OpMode {
         }
         // Reset functions
         if (gamepad1.left_trigger > 0.8) {
+            // manual pinpoint heading reset
+            if (gamepad1.dpadUpWasPressed()) {
+                pinpoint.teleOpResetHeading();
+                alertAction(RGBLights.Colors.BLUE);
+            }
             // limelight pose reset
 //            llVision.trackPose(blueAlliance);
 //            if (llVision.tagSeen) {
@@ -245,12 +250,6 @@ public class DualDriverTeleOp extends OpMode {
 //                telemetry.addData("LL X", currentLLPose.getX());
 //                telemetry.addData("LL Y", currentLLPose.getY());
 //            }
-
-            // manual pinpoint heading reset
-            if (gamepad1.bWasPressed()) {
-                pinpoint.teleOpResetHeading();
-                alertAction(RGBLights.Colors.BLUE);
-            }
         }
 
         // toggling idle RPM

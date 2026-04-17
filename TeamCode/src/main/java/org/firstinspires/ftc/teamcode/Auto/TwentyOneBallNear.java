@@ -57,6 +57,7 @@ public class TwentyOneBallNear extends OpMode {
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double RAPID_FIRE_DELAY = 0.4;
     private final double WAIT_GATE_DELAY = 1.6; // TODO
+    private final double GATE_BRAKING_START = 1.3; // idk how big of a difference this makes
 
     private final double DELAY_BEFORE_MOVING = 50; // milliseconds
 
@@ -74,11 +75,11 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose score101112PoseBlue = score789PoseBlue;
     private final Pose grab131415PoseBlue  = grab789PoseBlue;
     private final Pose score131415PoseBlue = score789PoseBlue;
-    private final Pose prepGrab161718HeadingBlue = new Pose(0,0, Math.toRadians(262));
+    private final Pose prepGrab161718HeadingBlue = new Pose(72,72, Math.toRadians(262));
     private final Pose grab161718PoseBlue  = new Pose(17,36.4, Math.toRadians(180));
     private final Pose grab161718ControlPose1Blue = new Pose(55.4,36.5, 0);
     private final Pose grab161718ControlPose2Blue = new Pose(49.4,36, 0);
-    private final Pose prepScore161718HeadingBlue = new Pose(0,0, Math.toRadians(238));
+    private final Pose prepScore161718PoseBlue = new Pose(18,37.4, Math.toRadians(238));
     private final Pose score161718PoseBlue = new Pose(48.7,84.7, Math.toRadians(180));
     private final Pose grab192021PoseBlue  = new Pose(22,84.5, Math.toRadians(180));
     private final Pose score192021PoseBlue = new Pose(49,84.5, Math.toRadians(180));
@@ -97,11 +98,11 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose grab131415PoseRed  = grab789PoseRed;
     private final Pose score131415PoseRed = score789PoseRed;
     private final Pose prepGrab161718HeadingRed = prepGrab161718HeadingBlue.mirror();
-    private final Pose grab161718PoseRed  = grab161718PoseBlue.mirror(); // TODO turnTo(278) before this path
+    private final Pose grab161718PoseRed  = grab161718PoseBlue.mirror();
     private final Pose grab161718ControlPose1Red = grab161718ControlPose1Blue.mirror();
     private final Pose grab161718ControlPose2Red = grab161718ControlPose2Blue.mirror();
-    private final Pose prepScore161718HeadingRed = prepScore161718HeadingBlue.mirror();
-    private final Pose score161718PoseRed = score161718PoseBlue.mirror(); // TODO turnTo(302) before this path
+    private final Pose prepScore161718PoseRed = prepScore161718PoseBlue.mirror();
+    private final Pose score161718PoseRed = score161718PoseBlue.mirror();
     private final Pose grab192021PoseRed  = grab192021PoseBlue.mirror();
     private final Pose score192021PoseRed = score192021PoseBlue.mirror();
     private final Pose parkPoseRed        = parkPoseBlue.mirror();
@@ -109,10 +110,10 @@ public class TwentyOneBallNear extends OpMode {
     // PathChains
     private PathChain BScore123, BGrab456, BScore456, BGrab789, BScore789;
     private PathChain BGrab101112, BScore101112, BGrab131415, BScore131415;
-    private PathChain BGrab161718, BScore161718, BGrab192021, BScore192021, BPark;
+    private PathChain BGrab161718, BPrepScore161718, BScore161718, BGrab192021, BScore192021, BPark;
     private PathChain RScore123, RGrab456, RScore456, RGrab789, RScore789;
     private PathChain RGrab101112, RScore101112, RGrab131415, RScore131415;
-    private PathChain RGrab161718, RScore161718, RGrab192021, RScore192021, RPark;
+    private PathChain RGrab161718, RPrepScore161718, RScore161718, RGrab192021, RScore192021, RPark;
 
     public void buildPaths() {
         /// BLUE SIDE
@@ -137,6 +138,7 @@ public class TwentyOneBallNear extends OpMode {
         BGrab789 = follower.pathBuilder()
                 .addPath(new BezierLine(score456PoseBlue, grab789PoseBlue))
                 .setLinearHeadingInterpolation(score456PoseBlue.getHeading(), grab789PoseBlue.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         BScore789 = follower.pathBuilder()
@@ -147,6 +149,7 @@ public class TwentyOneBallNear extends OpMode {
         BGrab101112 = follower.pathBuilder()
                 .addPath(new BezierLine(score789PoseBlue, grab101112PoseBlue))
                 .setLinearHeadingInterpolation(score789PoseBlue.getHeading(), grab101112PoseBlue.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         BScore101112 = follower.pathBuilder()
@@ -157,6 +160,7 @@ public class TwentyOneBallNear extends OpMode {
         BGrab131415 = follower.pathBuilder()
                 .addPath(new BezierLine(score101112PoseBlue, grab131415PoseBlue))
                 .setLinearHeadingInterpolation(score101112PoseBlue.getHeading(), grab131415PoseBlue.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         BScore131415 = follower.pathBuilder()
@@ -164,14 +168,19 @@ public class TwentyOneBallNear extends OpMode {
                 .setLinearHeadingInterpolation(grab131415PoseBlue.getHeading(), score131415PoseBlue.getHeading())
                 .build();
 
-        BGrab161718 = follower.pathBuilder() /// Funny heading stuff before and after
+        BGrab161718 = follower.pathBuilder()
                 .addPath(new BezierCurve(score131415PoseBlue, grab161718ControlPose1Blue, grab161718ControlPose2Blue, grab161718PoseBlue))
                 .setLinearHeadingInterpolation(prepGrab161718HeadingBlue.getHeading(), grab161718PoseBlue.getHeading(), 0.7)
                 .build();
 
-        BScore161718 = follower.pathBuilder() /// Funny heading stuff before
-                .addPath(new BezierLine(grab161718PoseBlue, score161718PoseBlue))
-                .setLinearHeadingInterpolation(prepScore161718HeadingBlue.getHeading(), score161718PoseBlue.getHeading())
+        BPrepScore161718 = follower.pathBuilder()
+                .addPath(new BezierLine(grab161718PoseBlue, prepScore161718PoseBlue))
+                .setLinearHeadingInterpolation(grab161718PoseBlue.getHeading(), prepScore161718PoseBlue.getHeading())
+                .build();
+
+        BScore161718 = follower.pathBuilder()
+                .addPath(new BezierLine(prepScore161718PoseBlue, score161718PoseBlue))
+                .setLinearHeadingInterpolation(prepScore161718PoseBlue.getHeading(), score161718PoseBlue.getHeading())
                 .build();
 
         BGrab192021 = follower.pathBuilder()
@@ -196,7 +205,6 @@ public class TwentyOneBallNear extends OpMode {
         RScore123 = follower.pathBuilder()
                 .addPath(new BezierLine(startPoseRed, score123PoseRed))
                 .setLinearHeadingInterpolation(startPoseRed.getHeading(), score123PoseRed.getHeading())
-//                .setGlobalDeceleration()
                 .build();
 
         RGrab456 = follower.pathBuilder()
@@ -214,6 +222,7 @@ public class TwentyOneBallNear extends OpMode {
         RGrab789 = follower.pathBuilder()
                 .addPath(new BezierLine(score456PoseRed, grab789PoseRed))
                 .setLinearHeadingInterpolation(score456PoseRed.getHeading(), grab789PoseRed.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         RScore789 = follower.pathBuilder()
@@ -224,6 +233,7 @@ public class TwentyOneBallNear extends OpMode {
         RGrab101112 = follower.pathBuilder()
                 .addPath(new BezierLine(score789PoseRed, grab101112PoseRed))
                 .setLinearHeadingInterpolation(score789PoseRed.getHeading(), grab101112PoseRed.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         RScore101112 = follower.pathBuilder()
@@ -234,6 +244,7 @@ public class TwentyOneBallNear extends OpMode {
         RGrab131415 = follower.pathBuilder()
                 .addPath(new BezierLine(score101112PoseRed, grab131415PoseRed))
                 .setLinearHeadingInterpolation(score101112PoseRed.getHeading(), grab131415PoseRed.getHeading())
+                .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
 
         RScore131415 = follower.pathBuilder()
@@ -241,14 +252,19 @@ public class TwentyOneBallNear extends OpMode {
                 .setLinearHeadingInterpolation(grab131415PoseRed.getHeading(), prepGrab161718HeadingRed.getHeading())
                 .build();
 
-        RGrab161718 = follower.pathBuilder() /// Funny heading stuff before and after
+        RGrab161718 = follower.pathBuilder()
                 .addPath(new BezierCurve(score131415PoseRed, grab161718ControlPose1Red, grab161718ControlPose2Red, grab161718PoseRed))
                 .setLinearHeadingInterpolation(prepGrab161718HeadingRed.getHeading(), grab161718PoseRed.getHeading(), 0.7)
                 .build();
 
-        RScore161718 = follower.pathBuilder() /// Funny heading stuff before
-                .addPath(new BezierLine(grab161718PoseRed, score161718PoseRed))
-                .setLinearHeadingInterpolation(prepScore161718HeadingRed.getHeading(), score161718PoseRed.getHeading())
+        RPrepScore161718 = follower.pathBuilder()
+                .addPath(new BezierLine(grab161718PoseRed, prepScore161718PoseRed))
+                .setLinearHeadingInterpolation(grab161718PoseRed.getHeading(), prepScore161718PoseRed.getHeading())
+                .build();
+
+        RScore161718 = follower.pathBuilder()
+                .addPath(new BezierLine(prepScore161718PoseRed, score161718PoseRed))
+                .setLinearHeadingInterpolation(prepScore161718PoseRed.getHeading(), score161718PoseRed.getHeading())
                 .build();
 
         RGrab192021 = follower.pathBuilder()
@@ -441,7 +457,7 @@ public class TwentyOneBallNear extends OpMode {
                     shooter.closeLatch();
                     intake.stowIntake();
                     delayedIdleAction();
-                    follower.turnTo(blueAlliance ? prepScore161718HeadingBlue.getHeading() : prepScore161718HeadingRed.getHeading()); /// Maybe broken or buggy
+                    follower.followPath(blueAlliance ? BPrepScore161718 : RPrepScore161718, false);
                     setPathState(21);
                 }
                 break;

@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.ArrayList;
@@ -21,9 +19,17 @@ public class MecanumDrive {
     OpMode opmode;
     private DcMotorEx Fl, Fr, Bl, Br;
     private volatile double prevFrontLeftPower, prevBackLeftPower, prevFrontRightPower, prevBackRightPower;
+    private ElapsedTime timer = new ElapsedTime();
 
     public static double SLOW_MODE_FACTOR = 0.5;
     public static double CACHING_THRESHOLD = 0.005; // TODO
+
+    public volatile boolean angleLock = false;
+
+    public static double Kp = 0.0007; // TODO
+    public static double Kd = 0.0001; // TODO
+    public static double BLUE_GATE_HEADING = 150;
+    public static double RED_GATE_HEADING = 30;
 
 //    private VoltageSensor battery;
 
@@ -57,25 +63,31 @@ public class MecanumDrive {
         this.Br = robotHardware.Br;
     }
 
-    public void operateSimple() {
+    public void operateTeleOp(double currentHeading, boolean blueAlliance) {
 //        if (timer.milliseconds() > 100) {
 //            readCurrents();
 //            timer.reset();
 //        }
-        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, opmode.gamepad1.right_stick_button || opmode.gamepad1.left_trigger > 0.3);
+        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, (opmode.gamepad1.a ? calculatePD(blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING, currentHeading) : opmode.gamepad1.right_stick_x),  opmode.gamepad1.left_trigger > 0.3);
 //        opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
 
-        if (opmode.gamepad1.left_trigger > 0.3 && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
+        if ((opmode.gamepad1.left_trigger > 0.3 || opmode.gamepad1.a) && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
             Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        } else if (Fl.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
+        } else if ((opmode.gamepad1.left_trigger < 0.3 && !opmode.gamepad1.a) && Fl.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
             Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         }
+
+        opmode.telemetry.addLine("\n DEBUGGING"); // TODO Comment out later
+        opmode.telemetry.addData("currentHeading ", currentHeading);
+        opmode.telemetry.addData("targetHeading ", blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING);
+        opmode.telemetry.addData("blueAlliance", blueAlliance);
+        opmode.telemetry.addData("calculated rx [-1,1] ", calculatePD(blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING, currentHeading));
     }
 
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
@@ -113,7 +125,6 @@ public class MecanumDrive {
         driveFieldCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, heading, opmode.gamepad1.right_stick_button || opmode.gamepad1.left_bumper);
         opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
     }
-
     public void driveFieldCentric(double x, double y, double rx, double heading, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 0.6);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
@@ -145,6 +156,30 @@ public class MecanumDrive {
     // checks if powers are different enough
     public boolean comparePower(double prevPower, double currentPower) {
         return Math.abs(currentPower - prevPower) > CACHING_THRESHOLD;
+    }
+
+    public double calculatePD(double targetHeading, double currentHeading) {
+        // calculate the error
+        double error = normalizeError(currentHeading - targetHeading);
+
+        double derivative = (error - lastError) / timer.seconds();
+
+        double output = (Kp * error) + (Kd * derivative); // TODO maybe need sqrt? (below)
+//        output = Math.signum(output) * Math.sqrt(Math.min(1, Math.abs(output)));
+        output = Math.max(-1, Math.min(1, output));
+
+        // reset stuff for next time
+        timer.reset();
+        lastError = error;
+
+        return output;
+    }
+
+    private double normalizeError(double error) {
+        // Normalize error to -180 to 180
+        while (error > 180) error -= 360;
+        while (error < -180) error += 360;
+        return error;
     }
 
 //    private void readCurrents() {

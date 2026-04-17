@@ -146,11 +146,11 @@ public class Intake {
             if (opmode.gamepad1.right_trigger > 0.2) {
                 if (transferFull && !continuousShot) { runIntakeOnly(); }
                 else { intakingIntake(); }
-            } else if (opmode.gamepad1.aWasPressed() && intakeState != IntakeState.REVERSE) {
+            } else if (opmode.gamepad1.yWasPressed() && intakeState != IntakeState.REVERSE) {
                 reverse();
-            } else if (opmode.gamepad1.aWasReleased() && intakeState == IntakeState.REVERSE) {
+            } else if (opmode.gamepad1.yWasReleased() && intakeState == IntakeState.REVERSE) {
                 idle();
-            } else if (opmode.gamepad1.right_trigger <= 0.1 && intakeState != IntakeState.IDLE && intakeState != IntakeState.REVERSE) {
+            } else if (opmode.gamepad1.right_trigger <= 0.2 && intakeState != IntakeState.IDLE && intakeState != IntakeState.REVERSE) {
                 idle();
             }
         }

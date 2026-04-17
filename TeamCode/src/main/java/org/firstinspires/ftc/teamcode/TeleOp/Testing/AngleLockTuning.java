@@ -10,12 +10,13 @@ import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @Configurable
-@TeleOp(name = "Intake + Drive Only", group = "Testing")
-public class IntakeDrive extends OpMode{
+@TeleOp(name = "Angle Lock Tuning", group = "Testing")
+public class AngleLockTuning extends OpMode{
     private Intake intake = new Intake();
     private MecanumDrive drive = new MecanumDrive();
     private RobotHardware robotHardware = new RobotHardware();
     private PinpointManager pinpoint = new PinpointManager();
+    private volatile boolean blueAlliance = true;
 
     @Override
     public void init() {
@@ -27,16 +28,14 @@ public class IntakeDrive extends OpMode{
 
     @Override
     public void loop() {
-        drive.operateTeleOp(pinpoint.normalizedHeading, true);
+        if (gamepad1.b) {
+            blueAlliance = false;
+        } else if (gamepad1.x) {
+            blueAlliance = true;
+        }
+        drive.operateTeleOp(pinpoint.normalizedHeading, blueAlliance);
         intake.operateTeleOp(true, false);
         pinpoint.operateTrackingPose();
-        // dpad_up: incremental -
-        // dpad_down: incremental +
-        // A: stow (after changing values and loading onto bot)
-        // B: deploy (after changing values)
-
-        // POWER TESTING
-        // joystick: variable power
 
         telemetry.addLine("\nPOSE");
         telemetry.addData("pp X", pinpoint.X);
