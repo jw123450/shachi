@@ -224,7 +224,9 @@ public class FullTeleOp extends OpMode {
             }
         }
 
-        if (gamepad1.yWasPressed()) {
+        /// Reset functions
+        if (gamepad1.dpadDownWasPressed()) {
+            ///  limelight POSE reloc
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
@@ -234,15 +236,17 @@ public class FullTeleOp extends OpMode {
                     alertAction(RGBLights.Colors.ORANGE);
                 } else {
                     pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
+                    Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
+                    Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
+                    Globals.redGoalX = Globals.PERMANENT_redGoalX;
+                    Globals.redGoalY = Globals.PERMANENT_redGoalY;
                     alertAction(RGBLights.Colors.BLUE);
                 }
             }
         }
-        // Reset functions
         if (gamepad1.left_trigger > 0.8) {
-
-            // manual pinpoint heading reset
-            if (gamepad1.bWasPressed()) {
+            /// manual pinpoint HEADING reloc
+            if (gamepad1.dpadUpWasPressed()) {
                 pinpoint.teleOpResetHeading();
                 alertAction(RGBLights.Colors.BLUE);
             }
@@ -250,10 +254,10 @@ public class FullTeleOp extends OpMode {
 
         // toggling idle RPM
         if (gamepad1.xWasPressed()) {
-            if (cyclingFarZone) { // toggle from far to near
+            if (cyclingFarZone) { // far to near
                 cyclingFarZone = false;
                 alertAction(RGBLights.Colors.YELLOW);
-            } else { // toggle from near to far
+            } else { // near to far
                 cyclingFarZone = true;
                 alertAction(RGBLights.Colors.VIOLET);
             }

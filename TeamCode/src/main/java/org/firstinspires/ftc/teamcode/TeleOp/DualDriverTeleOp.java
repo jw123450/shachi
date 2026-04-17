@@ -210,7 +210,9 @@ public class DualDriverTeleOp extends OpMode {
 
         intake.operateTeleOp(useManualIntake, continuousShot);
 
+        /// Reset functions
         if (gamepad1.dpadDownWasPressed()) {
+            ///  limelight reloc
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
                 Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
@@ -228,28 +230,12 @@ public class DualDriverTeleOp extends OpMode {
                 }
             }
         }
-        // Reset functions
         if (gamepad1.left_trigger > 0.8) {
-            // manual pinpoint heading reset
+            /// manual pinpoint heading reset
             if (gamepad1.dpadUpWasPressed()) {
                 pinpoint.teleOpResetHeading();
                 alertAction(RGBLights.Colors.BLUE);
             }
-            // limelight pose reset
-//            llVision.trackPose(blueAlliance);
-//            if (llVision.tagSeen) {
-//                Pose currentLLPose = llVision.absRelocalize(Math.toRadians(pinpoint.normalizedHeading));
-//                if (gamepad1.yWasPressed()) {
-//                    if (currentLLPose.getX() == 0 || currentLLPose.getY() == 0) {
-//                        alertAction(RGBLights.Colors.ORANGE);
-//                    } else {
-//                        pinpoint.teleOpAprilTagReset(currentLLPose, llVision.getTag() == 24);
-//                        alertAction(RGBLights.Colors.BLUE);
-//                    }
-//                }
-//                telemetry.addData("LL X", currentLLPose.getX());
-//                telemetry.addData("LL Y", currentLLPose.getY());
-//            }
         }
 
         // toggling idle RPM
