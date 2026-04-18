@@ -71,9 +71,9 @@ public class FarHPCycle extends OpMode {
     private final Pose prepGrabS3PoseBlue   = new Pose(45, 33.5, Math.toRadians(180));
     private final Pose grabS3PoseBlue       = new Pose(15, 35.5, Math.toRadians(180));
     private final Pose hpPrepPoseBlueCorner = new Pose(18.5, 8, Math.toRadians(180));
-    private final Pose hpGrabPoseBlueCorner = new Pose(13.5, 8, Math.toRadians(180));
+    private final Pose hpGrabPoseBlueCorner = new Pose(14.5, 8, Math.toRadians(180));
     private final Pose hpPrepPoseBlueMiddle = new Pose(18.5, 16, Math.toRadians(180));
-    private final Pose hpGrabPoseBlueMiddle = new Pose(13.5, 16, Math.toRadians(180));
+    private final Pose hpGrabPoseBlueMiddle = new Pose(14.5, 16, Math.toRadians(180));
     private final Pose hpPrepPoseBlueHigh   = new Pose(14.5, 24, Math.toRadians(230));
     private final Pose hpGrabControlPoseBlueHigh = new Pose(11.5, 18.5, 0);
     private final Pose hpGrabPoseBlueHigh   = new Pose(9.5, 12.5, Math.toRadians(270));
@@ -196,8 +196,8 @@ public class FarHPCycle extends OpMode {
                 .build();
 
         RGrabHPMiddle = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseBlue, hpPrepPoseRedMiddle))
-                .setLinearHeadingInterpolation(scorePoseBlue.getHeading(), hpPrepPoseRedMiddle.getHeading())
+                .addPath(new BezierLine(scorePoseRed, hpPrepPoseRedMiddle))
+                .setLinearHeadingInterpolation(scorePoseRed.getHeading(), hpPrepPoseRedMiddle.getHeading())
                 .addPath(new BezierLine(hpPrepPoseRedMiddle, hpGrabPoseRedMiddle))
                 .setLinearHeadingInterpolation(hpPrepPoseRedMiddle.getHeading(), hpGrabPoseRedMiddle.getHeading())
                 .setGlobalDeceleration()
@@ -210,8 +210,8 @@ public class FarHPCycle extends OpMode {
 
 
         RGrabHPHigh = follower.pathBuilder()
-                .addPath(new BezierLine(scorePoseBlue, hpPrepPoseRedHigh))
-                .setLinearHeadingInterpolation(scorePoseBlue.getHeading(), hpPrepPoseRedHigh.getHeading())
+                .addPath(new BezierLine(scorePoseRed, hpPrepPoseRedHigh))
+                .setLinearHeadingInterpolation(scorePoseRed.getHeading(), hpPrepPoseRedHigh.getHeading())
                 .addPath(new BezierCurve(hpPrepPoseRedHigh, hpGrabControlPoseRedHigh, hpGrabPoseRedHigh))
                 .setLinearHeadingInterpolation(hpPrepPoseRedHigh.getHeading(), hpGrabPoseRedHigh.getHeading())
                 .setGlobalDeceleration()
@@ -438,6 +438,10 @@ public class FarHPCycle extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
+
+        Globals.blueGoalX = 8.5;
+        Globals.redGoalX = 138;
+        Globals.redGoalY = 142;
 
         elapsedtime = new ElapsedTime();
         elapsedtime.reset();
