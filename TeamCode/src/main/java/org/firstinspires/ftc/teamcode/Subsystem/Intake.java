@@ -158,9 +158,9 @@ public class Intake {
         /// intake arm
         if (isFull && !isArmStowed) {
             stowIntake();
-        } else if (opmode.gamepad1.rightBumperWasPressed() && !isFull) {
+        } else if ((opmode.gamepad1.rightBumperWasPressed() || opmode.gamepad1.a) && !isFull) {
             deployIntake();
-        } else if (opmode.gamepad1.rightBumperWasReleased() && !isFull) {
+        } else if ((opmode.gamepad1.rightBumperWasReleased() || opmode.gamepad1.aWasReleased()) && !isFull) {
             stowIntake();
         }
 
