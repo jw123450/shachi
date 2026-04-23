@@ -25,6 +25,9 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -41,10 +44,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
  * See the sensor's product page: https://www.gobilda.com/pinpoint-odometry-computer-imu-sensor-fusion-for-2-wheel-odometry/
  */
 @TeleOp(name = "Sensor: GoBilda Pinpoint", group = "Sensor")
-@Disabled
 public class SensorGoBildaPinpoint extends OpMode {
     // Create an instance of the sensor
     GoBildaPinpointDriver pinpoint;
+    public DcMotorEx Br, Bl, Fr, Fl;
+    public DcMotorEx intakeMotor, transferMotor;
+    public Servo leftIntakeServo, rightIntakeServo;
 
     @Override
     public void init() {
@@ -56,6 +61,24 @@ public class SensorGoBildaPinpoint extends OpMode {
 
         // Set the location of the robot - this should be the place you are starting the robot from
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+
+        transferMotor = hardwareMap.get(DcMotorEx.class, "transfer");
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intake");
+
+        leftIntakeServo = hardwareMap.get(Servo.class, "intakeL");
+        rightIntakeServo = hardwareMap.get(Servo.class, "intakeR");
+
+        rightIntakeServo.setDirection(Servo.Direction.REVERSE);
+
+        Fl = hardwareMap.get(DcMotorEx.class, "fl");
+        Fr = hardwareMap.get(DcMotorEx.class, "fr");
+        Bl = hardwareMap.get(DcMotorEx.class, "bl");
+        Br = hardwareMap.get(DcMotorEx.class, "br");
+
+        Fl.setDirection(DcMotorSimple.Direction.REVERSE);
+        Bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        Br.setDirection(DcMotorSimple.Direction.FORWARD);
+        Fr.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     @Override
@@ -72,6 +95,33 @@ public class SensorGoBildaPinpoint extends OpMode {
         telemetry.addData("X coordinate (IN)", pose2D.getX(DistanceUnit.INCH));
         telemetry.addData("Y coordinate (IN)", pose2D.getY(DistanceUnit.INCH));
         telemetry.addData("Heading angle (DEGREES)", pose2D.getHeading(AngleUnit.DEGREES));
+
+        ///  DRIVE
+        double x = gamepad1.left_stick_x;
+        double y = -gamepad1.left_stick_y;
+        double rx = gamepad1.right_stick_x;
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
+
+        Fl.setPower(frontLeftPower);
+        Bl.setPower(backLeftPower);
+        Fr.setPower(frontRightPower);
+        Br.setPower(backRightPower);
+
+        /// INTAKE
+        if (gamepad1.y) {
+            leftIntakeServo.setPosition(0.3);
+            rightIntakeServo.setPosition(0.3);
+        }
+        else if (gamepad1.a) {
+            leftIntakeServo.setPosition(0.5);
+            rightIntakeServo.setPosition(0.5);
+        }
+
     }
 
     public void configurePinpoint(){

@@ -70,23 +70,23 @@ public class MecanumDrive {
         driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, (opmode.gamepad1.a ? calculatePD((blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING), currentHeading) : opmode.gamepad1.right_stick_x),  opmode.gamepad1.left_trigger > 0.3);
 //        opmode.telemetry.addData("Motor Currents (FL,FR,BL,BR): ", motorCurrents);
 
-        if ((opmode.gamepad1.left_trigger > 0.3 || opmode.gamepad1.a) && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
-            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        } else if ((opmode.gamepad1.left_trigger < 0.3 && !opmode.gamepad1.a) && Fl.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
-            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        }
+//        if ((opmode.gamepad1.left_trigger > 0.3 || opmode.gamepad1.a) && Fl.getZeroPowerBehavior() != DcMotor.ZeroPowerBehavior.BRAKE) {
+//            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//        } else if ((opmode.gamepad1.left_trigger < 0.3 && !opmode.gamepad1.a) && Fl.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
+//            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        }
 
-        opmode.telemetry.addLine("\n DEBUGGING"); // TODO Comment out later
-        opmode.telemetry.addData("currentHeading ", currentHeading);
-        opmode.telemetry.addData("targetHeading ", blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING);
-        opmode.telemetry.addData("blueAlliance", blueAlliance);
-        opmode.telemetry.addData("calculated rx [-1,1] ", calculatePD(blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING, currentHeading));
+//        opmode.telemetry.addLine("\n DEBUGGING"); // TODO Comment out later
+//        opmode.telemetry.addData("currentHeading ", currentHeading);
+//        opmode.telemetry.addData("targetHeading ", blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING);
+//        opmode.telemetry.addData("blueAlliance", blueAlliance);
+//        opmode.telemetry.addData("calculated rx [-1,1] ", calculatePD(blueAlliance ? BLUE_GATE_HEADING : RED_GATE_HEADING, currentHeading));
     }
 
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {

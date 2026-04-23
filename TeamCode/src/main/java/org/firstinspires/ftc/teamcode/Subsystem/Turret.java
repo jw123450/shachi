@@ -62,7 +62,7 @@ public class Turret {
 //        else if (opmode.gamepad1.b) {
 //            setBoth(1);
 //        }
-        else if (opmode.gamepad1.a) {
+        else if (opmode.gamepad1.b) {
             setBoth(0.5);
         }
 
