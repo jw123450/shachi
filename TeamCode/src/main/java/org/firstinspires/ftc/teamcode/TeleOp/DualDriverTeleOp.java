@@ -138,12 +138,12 @@ public class DualDriverTeleOp extends OpMode {
             shooter.openLatch();
         }
         /// REQUEST SINGLE SHOT
-        else if (gamepad1.dpad_left && !gamepad2.right_bumper && useManualIntake) {
-            vinWantsToShoot = true;
-            singleShot = true;
-            continuousShot = false;
-            shooter.openLatch();
-        }
+//        else if (gamepad1.dpad_left && !gamepad2.right_bumper && useManualIntake) {
+//            vinWantsToShoot = true;
+//            singleShot = true;
+//            continuousShot = false;
+//            shooter.openLatch();
+//        }
         /// REQUEST CONTINUOUS SHOOTING
         else if (gamepad2.right_trigger > 0.8 && !gamepad2.right_bumper && !vinWantsToShoot) {
             vinWantsToShoot = true;
@@ -210,7 +210,7 @@ public class DualDriverTeleOp extends OpMode {
         intake.operateTeleOp(useManualIntake, continuousShot);
 
         /// Reset functions
-        if (gamepad1.dpadDownWasPressed()) {
+        if (gamepad1.dpadDownWasPressed() || gamepad2.yWasPressed()) {
             ///  limelight reloc
             llVision.trackPose(blueAlliance);
             if (llVision.tagSeen) {
@@ -242,9 +242,21 @@ public class DualDriverTeleOp extends OpMode {
             if (cyclingFarZone) { // toggle from far to near
                 cyclingFarZone = false;
                 alertAction(RGBLights.Colors.YELLOW);
+                if (blueAlliance) {
+                    adjustGoalPose(true, -2);
+                } else {
+                    adjustGoalPose(true, 2);
+                }
+
             } else { // toggle from near to far
                 cyclingFarZone = true;
                 alertAction(RGBLights.Colors.VIOLET);
+                if (blueAlliance) {
+                    adjustGoalPose(true, 2);
+                } else {
+                    adjustGoalPose(true, -2);
+                }
+
             }
         }
 
@@ -269,16 +281,16 @@ public class DualDriverTeleOp extends OpMode {
         // manual driver 2 goal pose adjust
         if (gamepad2.right_bumper) {
             if (gamepad2.dpadUpWasPressed()) {
-                adjustGoalPose(false, 1);
+                adjustGoalPose(false, 0.5);
                 microAlert(RGBLights.Colors.ORANGE);
             } else if (gamepad2.dpadDownWasPressed()) {
-                adjustGoalPose(false, -1);
+                adjustGoalPose(false, -0.5);
                 microAlert(RGBLights.Colors.ORANGE);
             } else if (gamepad2.dpadRightWasPressed()) {
-                adjustGoalPose(true, 1);
+                adjustGoalPose(true, 0.5);
                 microAlert(RGBLights.Colors.BLUE);
             } else if (gamepad2.dpadLeftWasPressed()) {
-                adjustGoalPose(true, -1);
+                adjustGoalPose(true, -0.5);
                 microAlert(RGBLights.Colors.BLUE);
             } else if (gamepad2.leftBumperWasPressed()) {
                 // full reset
@@ -338,7 +350,7 @@ public class DualDriverTeleOp extends OpMode {
         ));
     }
 
-    private void adjustGoalPose(boolean changeX, int dir) {
+    private void adjustGoalPose(boolean changeX, double dir) {
         if (changeX) {
             if (blueAlliance) {
                 Globals.blueGoalX += dir;
