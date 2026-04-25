@@ -10,10 +10,10 @@ public class Globals {
     public static double blueGoalY = 143; //139.5
     public static double redGoalX = 144; //145.5
     public static double redGoalY = 144; //139.5
-    public static double PERMANENT_blueGoalX = 6.5;
-    public static double PERMANENT_blueGoalY = 143;
-    public static double PERMANENT_redGoalX = 144;
-    public static double PERMANENT_redGoalY = 144;
+    public static double PERMANENT_blueGoalX = 10;
+    public static double PERMANENT_blueGoalY = 137;
+    public static double PERMANENT_redGoalX = 140;
+    public static double PERMANENT_redGoalY = 137;
     public static boolean blueAlliance = true;
-    public static double MINIMUM_LOOP_TIME = 11;
+    public static double MINIMUM_LOOP_TIME = 9;
 }

@@ -27,8 +27,8 @@ public class MecanumDrive {
 
     public static double Kp = 0.007; // TODO
     public static double Kd = 0.0001; // TODO
-    public static double BLUE_GATE_HEADING = 140;
-    public static double RED_GATE_HEADING = 40;
+    public static double BLUE_GATE_HEADING = 140; //140
+    public static double RED_GATE_HEADING = 35; //40
 
 //    private VoltageSensor battery;
 

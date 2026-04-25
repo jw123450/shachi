@@ -50,7 +50,7 @@ public class Shooter {
     double a1 = 2367.91298;
     double b1 = 0.0231239; //old: 0.0241839
     double c1 = 3.44382;
-    double d1 = 1629.90645;
+    double d1 = 1673.90645;
 
     double a2 = -0.0000219884;
     double b2 = 0.00782227;
