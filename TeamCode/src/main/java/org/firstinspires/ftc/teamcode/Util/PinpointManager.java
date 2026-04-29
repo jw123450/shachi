@@ -100,9 +100,9 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
     }
 
     public void teleOpManualReset(boolean blueAlliance) {
-        if (blueAlliance) {                                 // right side field is 63.5, -62
+        if (blueAlliance) {                                 // right side field is 63.5, -62 BLUE
             odo.setPosition(new Pose2D(DistanceUnit.INCH, 63.1, -64.8, AngleUnit.DEGREES, 180));
-        } else {                                            // right side field is 63.5, -62
+        } else {                                            // right side field is 63.5, -62 RED
             odo.setPosition(new Pose2D(DistanceUnit.INCH, -63.1, -64.8, AngleUnit.DEGREES, 0));
         }
     }
@@ -114,7 +114,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
     public void teleOpAprilTagReset(Pose currentPoseLL, boolean tag24red) {
         // currentPoseLL is already in pinpoint-style coords.
         if (tag24red) {
-            odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() + 3.5), (currentPoseLL.getY() + 3), AngleUnit.RADIANS, currentPoseLL.getHeading()));
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() + 3.5), (currentPoseLL.getY() + 1), AngleUnit.RADIANS, currentPoseLL.getHeading()));
         } else {
             odo.setPosition(new Pose2D(DistanceUnit.INCH, (currentPoseLL.getX() - 4), (currentPoseLL.getY()+1), AngleUnit.RADIANS, currentPoseLL.getHeading()));
         }
