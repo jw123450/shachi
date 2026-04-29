@@ -62,36 +62,49 @@ public class TwentyOneBallNear extends OpMode {
     private final double DELAY_BEFORE_MOVING = 50; // milliseconds
 
     /// BLUE SIDE POSES
-    /// BLUE start 21, 118.37, deg 141.16
-    /// RED start 122.93. 119.2, deg 37.45
-    private final Pose startPoseBlue    = new Pose(19.37, 113.67, Math.toRadians(180)); // TODO measure accurately & test with 72,72 opmode
+    /// blue start 20 113.8 180
+    /// 20 114.3 180 (backup)
+
+    /// red start 124.8 114 0
+    /// 125 114.2 0 (backup)
+
+    /// blue gate 15.7 59.3 140
+    /// red gate  130.5 60.8 40
+    private final Pose startPoseBlue    = new Pose(20, 113.8, Math.toRadians(180)); // TODO measure accurately & test with 72,72 opmode
     private final Pose score123PoseBlue = new Pose(64,69, Math.toRadians(180));
     private final Pose prepGrab456PoseBlue = new Pose(40.8, 60, Math.toRadians(180));
     private final Pose grab456PoseBlue  = new Pose(19,60, Math.toRadians(180));
     private final Pose score456PoseBlue = new Pose(60.5,73.5, Math.toRadians(170));
-    private final Pose grab789PoseBlue  = new Pose(15.75, 59.2, Math.toRadians(148)); /// gate
-    private final Pose score789PoseBlue = new Pose(60.3,70.5, Math.toRadians(170));
+
+    private final Pose grab789PoseBlue  = /** BLUE BLUE */new Pose(14.9, 59.45, Math.toRadians(148)); /// gate
+    ///                                                               15.7
+
+    private final Pose grab789PoseRed   = /** RED RED */new Pose(131.5, 59.45, Math.toRadians(32)); /// gate
+    ///                                                             130.7
+
+    private final Pose score789PoseBlue = new Pose(61.2,70.6, Math.toRadians(170));
     private final Pose grab101112PoseBlue  = grab789PoseBlue;
     private final Pose score101112PoseBlue = score789PoseBlue;
     private final Pose grab131415PoseBlue  = grab789PoseBlue;
     private final Pose score131415PoseBlue = score789PoseBlue;
     private final Pose prepGrab161718HeadingBlue = new Pose(72,72, Math.toRadians(262));
-    private final Pose grab161718PoseBlue  = new Pose(17,36.4, Math.toRadians(180));
-    private final Pose grab161718ControlPose1Blue = new Pose(55.4,36.5, 0);
-    private final Pose grab161718ControlPose2Blue = new Pose(49.4,36, 0);
-    private final Pose prepScore161718PoseBlue = new Pose(18,37.4, Math.toRadians(238));
+    private final Pose grab161718PoseBlue  = new Pose(17,39.4, Math.toRadians(180));
+    private final Pose grab161718ControlPose1Blue = new Pose(55.4,39.5, 0);
+    private final Pose grab161718ControlPose2Blue = new Pose(49.4,39, 0);
+    private final Pose prepScore161718PoseBlue = new Pose(18,39.5, Math.toRadians(238));
     private final Pose score161718PoseBlue = new Pose(48.7,84.7, Math.toRadians(180));
     private final Pose grab192021PoseBlue  = new Pose(22,84.5, Math.toRadians(180));
     private final Pose score192021PoseBlue = new Pose(49,84.5, Math.toRadians(180));
     private final Pose parkPoseBlue        = new Pose(47,83.5, Math.toRadians(225));
 
     /// RED SIDE POSES
-    private final Pose startPoseRed     = startPoseBlue.mirror();
+    private final Pose startPoseRed     = new Pose(124.3, 114, Math.toRadians(0));
     private final Pose score123PoseRed  = score123PoseBlue.mirror();
     private final Pose prepGrab456PoseRed = prepGrab456PoseBlue.mirror();
     private final Pose grab456PoseRed   = grab456PoseBlue.mirror();
     private final Pose score456PoseRed  = score456PoseBlue.mirror();
-    private final Pose grab789PoseRed   = grab789PoseBlue.mirror();
+
+
     private final Pose score789PoseRed  = score789PoseBlue.mirror();
     private final Pose grab101112PoseRed  = grab789PoseRed;
     private final Pose score101112PoseRed = score789PoseRed;
@@ -165,7 +178,7 @@ public class TwentyOneBallNear extends OpMode {
 
         BScore131415 = follower.pathBuilder()
                 .addPath(new BezierLine(grab131415PoseBlue, score131415PoseBlue))
-                .setLinearHeadingInterpolation(grab131415PoseBlue.getHeading(), score131415PoseBlue.getHeading())
+                .setLinearHeadingInterpolation(grab131415PoseBlue.getHeading(), prepGrab161718HeadingBlue.getHeading())
                 .build();
 
         BGrab161718 = follower.pathBuilder()
@@ -443,8 +456,8 @@ public class TwentyOneBallNear extends OpMode {
             case 19:
                 if (!follower.isTurning() && !currentlyShooting && pathTimer.getElapsedTime() > 100) {
                     runShooter = false;
-                    shooter.closeLatch();
-//                    closeLatchAction();
+//                    shooter.closeLatch();
+                    closeLatchAction();
                     intake.deployIntake();
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab161718 : RGrab161718, true);
@@ -455,15 +468,16 @@ public class TwentyOneBallNear extends OpMode {
             case 20:
                 if (!follower.isBusy() || intake.isFull) {
                     shooter.closeLatch();
+                    closeLatchAction();
                     intake.stowIntake();
-                    delayedIdleAction();
+                    delayedIdleAction(0.15);
                     follower.followPath(blueAlliance ? BPrepScore161718 : RPrepScore161718, false);
                     setPathState(21);
                 }
                 break;
             case 21:
                 if (!follower.isTurning()) {
-                    openLatchAction();
+                    openLatchAction(0.55);
                     follower.followPath(blueAlliance ? BScore161718 : RScore161718, true);
                     setPathState(22);
                 }
@@ -664,11 +678,24 @@ public class TwentyOneBallNear extends OpMode {
         ));
     }
 
-    private void openLatchAction() {
-//        runningActions.add(new InstantAction(() -> shooter.openLatch()));
+    private void delayedIdleAction(double customDelay) {
         runningActions.add(new SequentialAction(
-                        new SleepAction(0.3),
-                        new InstantAction(() -> shooter.openLatch())
+                new SleepAction(customDelay),
+                new InstantAction(() -> intake.idle())
+        ));
+    }
+
+    private void openLatchAction() {
+        runningActions.add(new SequentialAction(
+                new SleepAction(0.3),
+                new InstantAction(() -> shooter.openLatch())
+        ));
+    }
+
+    private void openLatchAction(double customDelay) {
+        runningActions.add(new SequentialAction(
+                new SleepAction(customDelay),
+                new InstantAction(() -> shooter.openLatch())
         ));
     }
 

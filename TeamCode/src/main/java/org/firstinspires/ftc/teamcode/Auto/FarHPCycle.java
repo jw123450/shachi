@@ -56,31 +56,30 @@ public class FarHPCycle extends OpMode {
     private volatile boolean currentlyShooting = false;
     private boolean cyclingFarZone = true; // for shooter
     private boolean grabS3 = false;
-    private final double LATCH_OPENING_DELAY = 0.26767;
 
     ///  CONSTANTS
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double RAPID_FIRE_DELAY = 0.6; // seconds (sleepAction)
-    private final double DELAY_BEFORE_MOVING = 150; // milliseconds
+    private final double DELAY_BEFORE_MOVING = 50; // milliseconds
 
     /// BLUE SIDE
-    /// BLUE 55.8, 7.6, 180
-    /// RED 91.04, 8.09, 0
-    private final Pose startPoseBlue        = new Pose(55.8,7.6, Math.toRadians(180));
-    private final Pose scorePoseBlue        = new Pose(50.5, 11.5, Math.toRadians(180));
+    /// blue start 56.4 9 180
+    /// red start 90.6 9.8 0
+    private final Pose startPoseBlue        = new Pose(56.4,9, Math.toRadians(180));
+    private final Pose scorePoseBlue        = new Pose(50.5, 12, Math.toRadians(180));
     private final Pose prepGrabS3PoseBlue   = new Pose(45, 33.5, Math.toRadians(180));
     private final Pose grabS3PoseBlue       = new Pose(15, 35.5, Math.toRadians(180));
     private final Pose hpPrepPoseBlueCorner = new Pose(18.5, 8, Math.toRadians(180));
-    private final Pose hpGrabPoseBlueCorner = new Pose(14.5, 8, Math.toRadians(180));
+    private final Pose hpGrabPoseBlueCorner = new Pose(11.5, 8, Math.toRadians(180));
     private final Pose hpPrepPoseBlueMiddle = new Pose(18.5, 16, Math.toRadians(180));
-    private final Pose hpGrabPoseBlueMiddle = new Pose(14.5, 16, Math.toRadians(180));
+    private final Pose hpGrabPoseBlueMiddle = new Pose(13.5, 16, Math.toRadians(180));
     private final Pose hpPrepPoseBlueHigh   = new Pose(14.5, 24, Math.toRadians(230));
     private final Pose hpGrabControlPoseBlueHigh = new Pose(11.5, 18.5, 0);
     private final Pose hpGrabPoseBlueHigh   = new Pose(9.5, 12.5, Math.toRadians(270));
     private final Pose parkPoseBlue         = new Pose(49, 13, Math.toRadians(135));
 
     /// RED SIDE
-    private final Pose startPoseRed        = startPoseBlue.mirror();
+    private final Pose startPoseRed        = new Pose(87.6, 9, Math.toRadians(0));
     private final Pose scorePoseRed        = scorePoseBlue.mirror();
     private final Pose prepGrabS3PoseRed   = prepGrabS3PoseBlue.mirror();
     private final Pose grabS3PoseRed       = grabS3PoseBlue.mirror();
@@ -237,12 +236,12 @@ public class FarHPCycle extends OpMode {
                 runShooter = true;
                 runTurret = true;
                 openLatchAction();
-                follower.followPath(blueAlliance ? BScore123 : RScore123, 0.5, true);
+                follower.followPath(blueAlliance ? BScore123 : RScore123, true);
                 setPathState(1);
                 break;
             /// SCORE PRELOAD (123)
             case 1:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
+                if ((!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) || pathTimer.getElapsedTimeSeconds() > 1.5) {
                     currentlyShooting = true;
                     rapidFireAction();
                     if (grabS3) {
@@ -292,7 +291,7 @@ public class FarHPCycle extends OpMode {
                 }
                 break;
             case 3:
-                if (!follower.isBusy() || intake.isFull) {
+                if (!follower.isBusy() || intake.isFull || pathTimer.getElapsedTimeSeconds() > 2) {
                     delayedIdleAction();
                     openLatchAction();
                     runShooter = true;
@@ -320,7 +319,7 @@ public class FarHPCycle extends OpMode {
                 }
                 break;
             case 6:
-                if (!follower.isBusy() || intake.isFull) {
+                if (!follower.isBusy() || intake.isFull || pathTimer.getElapsedTimeSeconds() > 2.5) {
                     delayedIdleAction();
                     openLatchAction();
                     runShooter = true;
@@ -348,7 +347,7 @@ public class FarHPCycle extends OpMode {
                 }
                 break;
             case 9:
-                if (!follower.isBusy() || intake.isFull) {
+                if (!follower.isBusy() || intake.isFull || pathTimer.getElapsedTimeSeconds() > 2) {
                     delayedIdleAction();
                     openLatchAction();
                     runShooter = true;
@@ -375,7 +374,7 @@ public class FarHPCycle extends OpMode {
                 }
                 break;
             case 12:
-                if (!follower.isBusy() || intake.isFull) {
+                if (!follower.isBusy() || intake.isFull || pathTimer.getElapsedTimeSeconds() > 2) {
                     delayedIdleAction();
                     openLatchAction();
                     runShooter = true;
@@ -438,10 +437,6 @@ public class FarHPCycle extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
-
-        Globals.blueGoalX = 8.5;
-        Globals.redGoalX = 138;
-        Globals.redGoalY = 142;
 
         elapsedtime = new ElapsedTime();
         elapsedtime.reset();
@@ -564,7 +559,7 @@ public class FarHPCycle extends OpMode {
 
     private void openLatchAction() {
         runningActions.add(new SequentialAction(
-                new SleepAction(0.3),
+                new SleepAction(0.4),
                 new InstantAction(() -> shooter.openLatch())
         ));
     }
