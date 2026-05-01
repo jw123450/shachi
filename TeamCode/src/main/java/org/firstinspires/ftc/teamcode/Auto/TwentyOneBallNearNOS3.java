@@ -29,8 +29,11 @@ import org.firstinspires.ftc.teamcode.Util.RGBLights;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "21 ball", group = "A", preselectTeleOp = "Full Teleop DUAL DRIVER")
-public class TwentyOneBallNear extends OpMode {
+@Autonomous(name = "21 ball NO S3", group = "A", preselectTeleOp = "Full Teleop DUAL DRIVER")
+public class TwentyOneBallNearNOS3 extends OpMode {
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
     private Follower follower;
     private Timer pathTimer, opmodeTimer;
@@ -39,7 +42,9 @@ public class TwentyOneBallNear extends OpMode {
     private List<Action> runningActions = new ArrayList<>();
     private List<LynxModule> allHubs;
     private ElapsedTime elapsedtime;
-
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
     private RobotHardware robotHardware = new RobotHardware();
     private Intake intake = new Intake();
@@ -54,11 +59,17 @@ public class TwentyOneBallNear extends OpMode {
     private volatile boolean runTurret = false;
     private volatile boolean cyclingFarZone = false;
     private volatile boolean currentlyShooting = false;
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    private volatile boolean extraCycleComplete = false;
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
     private final double TRANSFER_ONLY_DELAY = 0.03;
     private final double RAPID_FIRE_DELAY = 0.4;
     private final double WAIT_GATE_DELAY = 1.6; // TODO
     private final double GATE_BRAKING_START = 1.3; // idk how big of a difference this makes
-
     private final double DELAY_BEFORE_MOVING = 50; // milliseconds
 
     /// BLUE SIDE POSES
@@ -75,11 +86,15 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose prepGrab456PoseBlue = new Pose(40.8, 60, Math.toRadians(180));
     private final Pose grab456PoseBlue  = new Pose(19,60, Math.toRadians(180));
     private final Pose score456PoseBlue = new Pose(60.5,73.5, Math.toRadians(170));
-
-    private final Pose grab789PoseBlue  = /** BLUE BLUE */new Pose(14.8, 59.45, Math.toRadians(148)); /// gate
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    private final Pose grab789PoseBlue  = /** BLUE BLUE */new Pose(14.9, 59.45, Math.toRadians(148)); /// gate
     ///                                                               15.7
-
-    private final Pose grab789PoseRed   = /** RED RED */new Pose(131.6, 59.45, Math.toRadians(32)); /// gate
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    private final Pose grab789PoseRed   = /** RED RED */new Pose(131.5, 59.45, Math.toRadians(32)); /// gate
     ///                                                             130.7
 
     private final Pose score789PoseBlue = new Pose(61.2,70.6, Math.toRadians(170));
@@ -87,15 +102,13 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose score101112PoseBlue = score789PoseBlue;
     private final Pose grab131415PoseBlue  = grab789PoseBlue;
     private final Pose score131415PoseBlue = score789PoseBlue;
-    private final Pose prepGrab161718HeadingBlue = new Pose(72,72, Math.toRadians(262));
-    private final Pose grab161718PoseBlue  = new Pose(17,39.4, Math.toRadians(180));
-    private final Pose grab161718ControlPose1Blue = new Pose(55.4,39.5, 0);
-    private final Pose grab161718ControlPose2Blue = new Pose(49.4,39, 0);
-    private final Pose prepScore161718PoseBlue = new Pose(18,39.5, Math.toRadians(238));
-    private final Pose score161718PoseBlue = new Pose(48.7,84.7, Math.toRadians(180));
-    private final Pose grab192021PoseBlue  = new Pose(22,84.5, Math.toRadians(180));
+    private final Pose prepGrab192021PoseBlue = new Pose(46, 84.5, Math.toRadians(180));
+    private final Pose grab192021PoseBlue  = new Pose(19,84.5, Math.toRadians(180));
     private final Pose score192021PoseBlue = new Pose(49,84.5, Math.toRadians(180));
     private final Pose parkPoseBlue        = new Pose(47,83.5, Math.toRadians(225));
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
     /// RED SIDE POSES
     private final Pose startPoseRed     = new Pose(124.3, 114, Math.toRadians(0));
@@ -108,14 +121,12 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose score789PoseRed  = score789PoseBlue.mirror();
     private final Pose grab101112PoseRed  = grab789PoseRed;
     private final Pose score101112PoseRed = score789PoseRed;
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
     private final Pose grab131415PoseRed  = grab789PoseRed;
     private final Pose score131415PoseRed = score789PoseRed;
-    private final Pose prepGrab161718HeadingRed = prepGrab161718HeadingBlue.mirror();
-    private final Pose grab161718PoseRed  = grab161718PoseBlue.mirror();
-    private final Pose grab161718ControlPose1Red = grab161718ControlPose1Blue.mirror();
-    private final Pose grab161718ControlPose2Red = grab161718ControlPose2Blue.mirror();
-    private final Pose prepScore161718PoseRed = prepScore161718PoseBlue.mirror();
-    private final Pose score161718PoseRed = score161718PoseBlue.mirror();
+    private final Pose prepGrab192021PoseRed = prepGrab192021PoseBlue.mirror();
     private final Pose grab192021PoseRed  = grab192021PoseBlue.mirror();
     private final Pose score192021PoseRed = score192021PoseBlue.mirror();
     private final Pose parkPoseRed        = parkPoseBlue.mirror();
@@ -123,10 +134,13 @@ public class TwentyOneBallNear extends OpMode {
     // PathChains
     private PathChain BScore123, BGrab456, BScore456, BGrab789, BScore789;
     private PathChain BGrab101112, BScore101112, BGrab131415, BScore131415;
-    private PathChain BGrab161718, BPrepScore161718, BScore161718, BGrab192021, BScore192021, BPark;
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+    private PathChain BGrab192021, BScore192021, BPark;
     private PathChain RScore123, RGrab456, RScore456, RGrab789, RScore789;
     private PathChain RGrab101112, RScore101112, RGrab131415, RScore131415;
-    private PathChain RGrab161718, RPrepScore161718, RScore161718, RGrab192021, RScore192021, RPark;
+    private PathChain RGrab192021, RScore192021, RPark;
 
     public void buildPaths() {
         /// BLUE SIDE
@@ -135,6 +149,9 @@ public class TwentyOneBallNear extends OpMode {
                 .setLinearHeadingInterpolation(startPoseBlue.getHeading(), score123PoseBlue.getHeading())
 //                .setGlobalDeceleration()
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         BGrab456 = follower.pathBuilder()
                 .addPath(new BezierLine(score123PoseBlue, prepGrab456PoseBlue))
@@ -147,13 +164,18 @@ public class TwentyOneBallNear extends OpMode {
                 .addPath(new BezierLine(grab456PoseBlue, score456PoseBlue))
                 .setLinearHeadingInterpolation(grab456PoseBlue.getHeading(), score456PoseBlue.getHeading())
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         BGrab789 = follower.pathBuilder()
                 .addPath(new BezierLine(score456PoseBlue, grab789PoseBlue))
                 .setLinearHeadingInterpolation(score456PoseBlue.getHeading(), grab789PoseBlue.getHeading())
                 .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
-
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         BScore789 = follower.pathBuilder()
                 .addPath(new BezierLine(grab789PoseBlue, score789PoseBlue))
                 .setLinearHeadingInterpolation(grab789PoseBlue.getHeading(), score789PoseBlue.getHeading())
@@ -164,6 +186,9 @@ public class TwentyOneBallNear extends OpMode {
                 .setLinearHeadingInterpolation(score789PoseBlue.getHeading(), grab101112PoseBlue.getHeading())
                 .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         BScore101112 = follower.pathBuilder()
                 .addPath(new BezierLine(grab101112PoseBlue, score101112PoseBlue))
@@ -178,33 +203,26 @@ public class TwentyOneBallNear extends OpMode {
 
         BScore131415 = follower.pathBuilder()
                 .addPath(new BezierLine(grab131415PoseBlue, score131415PoseBlue))
-                .setLinearHeadingInterpolation(grab131415PoseBlue.getHeading(), prepGrab161718HeadingBlue.getHeading())
+                .setLinearHeadingInterpolation(grab131415PoseBlue.getHeading(), score131415PoseBlue.getHeading())
                 .build();
-
-        BGrab161718 = follower.pathBuilder()
-                .addPath(new BezierCurve(score131415PoseBlue, grab161718ControlPose1Blue, grab161718ControlPose2Blue, grab161718PoseBlue))
-                .setLinearHeadingInterpolation(prepGrab161718HeadingBlue.getHeading(), grab161718PoseBlue.getHeading(), 0.7)
-                .build();
-
-        BPrepScore161718 = follower.pathBuilder()
-                .addPath(new BezierLine(grab161718PoseBlue, prepScore161718PoseBlue))
-                .setLinearHeadingInterpolation(grab161718PoseBlue.getHeading(), prepScore161718PoseBlue.getHeading())
-                .build();
-
-        BScore161718 = follower.pathBuilder()
-                .addPath(new BezierLine(prepScore161718PoseBlue, score161718PoseBlue))
-                .setLinearHeadingInterpolation(prepScore161718PoseBlue.getHeading(), score161718PoseBlue.getHeading())
-                .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         BGrab192021 = follower.pathBuilder()
-                .addPath(new BezierLine(score161718PoseBlue, grab192021PoseBlue))
-                .setLinearHeadingInterpolation(score161718PoseBlue.getHeading(), grab192021PoseBlue.getHeading())
+                .addPath(new BezierLine(score131415PoseBlue, prepGrab192021PoseBlue))
+                .setLinearHeadingInterpolation(score131415PoseBlue.getHeading(), prepGrab192021PoseBlue.getHeading())
+                .addPath(new BezierLine(prepGrab192021PoseBlue, grab192021PoseBlue))
+                .setLinearHeadingInterpolation(prepGrab192021PoseBlue.getHeading(), grab192021PoseBlue.getHeading())
                 .build();
 
         BScore192021 = follower.pathBuilder()
                 .addPath(new BezierLine(grab192021PoseBlue, score192021PoseBlue))
                 .setLinearHeadingInterpolation(grab192021PoseBlue.getHeading(), score192021PoseBlue.getHeading())
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         BPark = follower.pathBuilder()
                 .addPath(new BezierLine(score192021PoseBlue, parkPoseBlue))
@@ -219,6 +237,9 @@ public class TwentyOneBallNear extends OpMode {
                 .addPath(new BezierLine(startPoseRed, score123PoseRed))
                 .setLinearHeadingInterpolation(startPoseRed.getHeading(), score123PoseRed.getHeading())
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         RGrab456 = follower.pathBuilder()
                 .addPath(new BezierLine(score123PoseRed, prepGrab456PoseRed))
@@ -231,6 +252,9 @@ public class TwentyOneBallNear extends OpMode {
                 .addPath(new BezierLine(grab456PoseRed, score456PoseRed))
                 .setLinearHeadingInterpolation(grab456PoseRed.getHeading(), score456PoseRed.getHeading())
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         RGrab789 = follower.pathBuilder()
                 .addPath(new BezierLine(score456PoseRed, grab789PoseRed))
@@ -248,6 +272,9 @@ public class TwentyOneBallNear extends OpMode {
                 .setLinearHeadingInterpolation(score789PoseRed.getHeading(), grab101112PoseRed.getHeading())
                 .setGlobalDeceleration(GATE_BRAKING_START)
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         RScore101112 = follower.pathBuilder()
                 .addPath(new BezierLine(grab101112PoseRed, score101112PoseRed))
@@ -262,27 +289,20 @@ public class TwentyOneBallNear extends OpMode {
 
         RScore131415 = follower.pathBuilder()
                 .addPath(new BezierLine(grab131415PoseRed, score131415PoseRed))
-                .setLinearHeadingInterpolation(grab131415PoseRed.getHeading(), prepGrab161718HeadingRed.getHeading())
+                .setLinearHeadingInterpolation(grab131415PoseRed.getHeading(), score131415PoseRed.getHeading())
                 .build();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
-        RGrab161718 = follower.pathBuilder()
-                .addPath(new BezierCurve(score131415PoseRed, grab161718ControlPose1Red, grab161718ControlPose2Red, grab161718PoseRed))
-                .setLinearHeadingInterpolation(prepGrab161718HeadingRed.getHeading(), grab161718PoseRed.getHeading(), 0.7)
-                .build();
-
-        RPrepScore161718 = follower.pathBuilder()
-                .addPath(new BezierLine(grab161718PoseRed, prepScore161718PoseRed))
-                .setLinearHeadingInterpolation(grab161718PoseRed.getHeading(), prepScore161718PoseRed.getHeading())
-                .build();
-
-        RScore161718 = follower.pathBuilder()
-                .addPath(new BezierLine(prepScore161718PoseRed, score161718PoseRed))
-                .setLinearHeadingInterpolation(prepScore161718PoseRed.getHeading(), score161718PoseRed.getHeading())
-                .build();
-
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         RGrab192021 = follower.pathBuilder()
-                .addPath(new BezierLine(score161718PoseRed, grab192021PoseRed))
-                .setLinearHeadingInterpolation(score161718PoseRed.getHeading(), grab192021PoseRed.getHeading())
+                .addPath(new BezierLine(score131415PoseRed, prepGrab192021PoseRed))
+                .setLinearHeadingInterpolation(score131415PoseRed.getHeading(), prepGrab192021PoseRed.getHeading())
+                .addPath(new BezierLine(prepGrab192021PoseRed, grab192021PoseRed))
+                .setLinearHeadingInterpolation(prepGrab192021PoseRed.getHeading(), grab192021PoseRed.getHeading())
                 .build();
 
         RScore192021 = follower.pathBuilder()
@@ -300,17 +320,22 @@ public class TwentyOneBallNear extends OpMode {
         switch (pathState) {
             ///  SPIN UP + DRIVE
             case 0:
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 Globals.blueGoalX = 3;
                 Globals.blueGoalY = 136;
                 Globals.redGoalX = Globals.PERMANENT_redGoalX;
                 Globals.redGoalY = Globals.PERMANENT_redGoalY;
-
                 cyclingFarZone = false; // redundant
                 runShooter = true;
                 runTurret = true;
                 shooter.openLatch();
                 follower.followPath(blueAlliance ? BScore123 : RScore123, true);
                 setPathState(1);
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 break;
             /// SCORE PRELOAD (123)
             case 1:
@@ -322,7 +347,9 @@ public class TwentyOneBallNear extends OpMode {
                 break;
             case 2:
                 if (!follower.isBusy() && !currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
-//                    runShooter = true;
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                     Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
                     Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
                     Globals.redGoalX = Globals.PERMANENT_redGoalX;
@@ -331,6 +358,9 @@ public class TwentyOneBallNear extends OpMode {
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab456 : RGrab456, 0.8, true);
                     setPathState(3);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// GRAB S2 (456)
@@ -342,6 +372,9 @@ public class TwentyOneBallNear extends OpMode {
 //                    runShooter = true;
                     follower.followPath(blueAlliance ? BScore456 : RScore456, true);
                     setPathState(4);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// SCORE S2 (456)
@@ -351,6 +384,9 @@ public class TwentyOneBallNear extends OpMode {
                     rapidFireAction();
                     setPathState(6);
                 }
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 break;
             /// GRAB GATE (789)
             case 6:
@@ -360,12 +396,18 @@ public class TwentyOneBallNear extends OpMode {
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab789 : RGrab789, true);
                     setPathState(7);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             // OPEN GATE
             case 7:
                 if (!follower.isBusy()) {
                     setPathState(8);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             // WAIT UNTIL INTAKE FULL OR TIME LIMIT PASSED
@@ -378,6 +420,9 @@ public class TwentyOneBallNear extends OpMode {
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore789 : RScore789, true);
                     setPathState(9);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// SCORE GATE (789)
@@ -386,6 +431,9 @@ public class TwentyOneBallNear extends OpMode {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(10);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// GRAB GATE (101112)
@@ -396,6 +444,9 @@ public class TwentyOneBallNear extends OpMode {
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab101112 : RGrab101112, true);
                     setPathState(11);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             // OPEN GATE
@@ -414,6 +465,9 @@ public class TwentyOneBallNear extends OpMode {
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore101112 : RScore101112, true);
                     setPathState(14);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// SCORE GATE (101112)
@@ -422,6 +476,9 @@ public class TwentyOneBallNear extends OpMode {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(15);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// GRAB GATE (131415)
@@ -432,12 +489,18 @@ public class TwentyOneBallNear extends OpMode {
                     intake.intakingIntake();
                     follower.followPath(blueAlliance ? BGrab131415 : RGrab131415, true);
                     setPathState(16);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             // OPEN GATE
             case 16:
                 if (!follower.isBusy()) {
                     setPathState(17);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             // WAIT UNTIL INTAKE FULL OR TIME LIMIT PASSED
@@ -450,6 +513,9 @@ public class TwentyOneBallNear extends OpMode {
                     runShooter = true;
                     follower.followPath(blueAlliance ? BScore131415 : RScore131415, true);
                     setPathState(18);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// SCORE GATE (131415)
@@ -457,46 +523,10 @@ public class TwentyOneBallNear extends OpMode {
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
                     currentlyShooting = true;
                     rapidFireAction();
-//                    follower.turnTo(blueAlliance ? prepGrab161718HeadingBlue.getHeading() : prepGrab161718HeadingRed.getHeading()); /// Maybe broken or buggy
-                    setPathState(19);
-                }
-                break;
-            ///  GRAB S3 (161718)
-            case 19:
-                if (!follower.isTurning() && !currentlyShooting && pathTimer.getElapsedTime() > 100) {
-                    runShooter = false;
-//                    shooter.closeLatch();
-                    closeLatchAction();
-                    intake.deployIntake();
-                    intake.intakingIntake();
-                    follower.followPath(blueAlliance ? BGrab161718 : RGrab161718, true);
-                    setPathState(20);
-                }
-                break;
-            /// SCORE S3 (161718)
-            case 20:
-                if (!follower.isBusy() || intake.isFull) {
-                    shooter.closeLatch();
-                    closeLatchAction();
-                    intake.stowIntake();
-                    delayedIdleAction(0.15);
-                    follower.followPath(blueAlliance ? BPrepScore161718 : RPrepScore161718, false);
-                    setPathState(21);
-                }
-                break;
-            case 21:
-                if (!follower.isTurning()) {
-                    openLatchAction(0.55);
-                    follower.followPath(blueAlliance ? BScore161718 : RScore161718, true);
-                    setPathState(22);
-                }
-                break;
-            case 22:
-                if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle && shooter.latchOpen) {
-                    intake.deployIntake();
-                    currentlyShooting = true;
-                    rapidFireAction();
                     setPathState(23);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// GRAB S1 (192021)
@@ -507,12 +537,33 @@ public class TwentyOneBallNear extends OpMode {
                     closeLatchAction();
                     intake.deployIntake();
                     intake.intakingIntake();
-                    follower.followPath(blueAlliance ? BGrab192021 : RGrab192021, true);
-                    setPathState(24);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    if (extraCycleComplete) {
+                        follower.followPath(blueAlliance ? BGrab192021 : RGrab192021, true);
+                        setPathState(24);
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    } else {
+                        extraCycleComplete = true;
+                        follower.followPath(blueAlliance ? BGrab131415 : RGrab131415, true);
+                        setPathState(16);
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    }
                 }
                 break;
-            /// SCORE S1 (192021)
+            /// SCORE S1
             case 24:
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 if (!follower.isBusy() || intake.isFull) {
                     delayedIdleAction();
                     openLatchAction();
@@ -525,6 +576,9 @@ public class TwentyOneBallNear extends OpMode {
                     currentlyShooting = true;
                     rapidFireAction();
                     setPathState(26);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// PARK
@@ -534,6 +588,9 @@ public class TwentyOneBallNear extends OpMode {
                     // park
                     follower.followPath(blueAlliance ? BPark : RPark, true);
                     setPathState(-1);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
             /// SHUT DOWN
@@ -545,6 +602,9 @@ public class TwentyOneBallNear extends OpMode {
                     intake.stowIntake();
                     shooter.closeLatch();
                     setPathState(-6962);
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                    ///  NO S3  NO S3  NO S3  NO S3  NO S3
                 }
                 break;
         }
@@ -555,12 +615,18 @@ public class TwentyOneBallNear extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         robotHardware.initialize(this);
         intake.initialize(this, robotHardware);
         llVision.initialize(this, robotHardware);
         shooter.initialize(this, robotHardware);
         turret.initialize(this, robotHardware);
         lights.initialize(this, robotHardware);
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -576,6 +642,9 @@ public class TwentyOneBallNear extends OpMode {
         shooter.closeLatch();
         shooter.initHood();
         lights.setColor(blueAlliance ? RGBLights.Colors.BLUE : RGBLights.Colors.RED);
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
     }
 
     @Override
@@ -587,6 +656,9 @@ public class TwentyOneBallNear extends OpMode {
             blueAlliance = true;
             lights.setColor(RGBLights.Colors.BLUE);
         }
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         follower.update();
 
@@ -602,6 +674,9 @@ public class TwentyOneBallNear extends OpMode {
             telemetry.addLine("PINPOINT IS COOKED");
             telemetry.addLine("PINPOINT IS COOKED");
         }
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         telemetry.addData("velocity magnitude", Math.abs(follower.getVelocity().getMagnitude()));
         telemetry.addData("angular velocity", Math.abs(follower.getAngularVelocity()));
         telemetry.update();
@@ -612,6 +687,9 @@ public class TwentyOneBallNear extends OpMode {
         follower.setStartingPose(blueAlliance ? startPoseBlue : startPoseRed);
         opmodeTimer.resetTimer();
         setPathState(0);
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
     }
 
     @Override
@@ -623,6 +701,9 @@ public class TwentyOneBallNear extends OpMode {
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) { if (action.run(packet)) { newActions.add(action); } }
         runningActions = newActions;
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         follower.update();
         Pose currentPose = follower.getPose();
@@ -638,6 +719,9 @@ public class TwentyOneBallNear extends OpMode {
 
 
         // Feedback to Driver Hub for debugging
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         telemetry.addLine("STATE TELEMETRY");
         telemetry.addData("path state ", pathState);
         telemetry.addData("runShooter? ", runShooter);
@@ -646,6 +730,9 @@ public class TwentyOneBallNear extends OpMode {
         telemetry.addLine("PEDRO TELEMETRY");
         telemetry.addData("isBusy? ", follower.isBusy());
         telemetry.addData("isRobotStuck? ", follower.isRobotStuck());
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         telemetry.addData("x ", currentPose.getX());
         telemetry.addData("y ", currentPose.getY());
         telemetry.addData("heading ", Math.toDegrees(currentPose.getHeading()));
@@ -658,6 +745,9 @@ public class TwentyOneBallNear extends OpMode {
 
     @Override
     public void stop() {
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         Globals.autoEndPose = follower.getPose();
         Globals.blueAlliance = blueAlliance;
     }
@@ -669,6 +759,9 @@ public class TwentyOneBallNear extends OpMode {
 
     // method for rapid firing to reduce
     private void rapidFireAction() {
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> intake.runTransferOnly()),
                 new SleepAction(TRANSFER_ONLY_DELAY),
@@ -677,6 +770,9 @@ public class TwentyOneBallNear extends OpMode {
                 new InstantAction(() -> intake.idle()),
                 new InstantAction(() -> shooter.closeLatch()),
                 new InstantAction(() -> currentlyShooting = false)
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
         ));
     }
 
@@ -684,6 +780,9 @@ public class TwentyOneBallNear extends OpMode {
         runningActions.add(new SequentialAction(
                 new SleepAction(0.3),
                 new InstantAction(() -> intake.idle())
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
+                ///  NO S3  NO S3  NO S3  NO S3  NO S3
         ));
     }
 
@@ -695,6 +794,9 @@ public class TwentyOneBallNear extends OpMode {
     }
 
     private void openLatchAction() {
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
         runningActions.add(new SequentialAction(
                 new SleepAction(0.3),
                 new InstantAction(() -> shooter.openLatch())
@@ -706,6 +808,9 @@ public class TwentyOneBallNear extends OpMode {
                 new SleepAction(customDelay),
                 new InstantAction(() -> shooter.openLatch())
         ));
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
     }
 
     private void closeLatchAction() {
@@ -718,6 +823,9 @@ public class TwentyOneBallNear extends OpMode {
 
     private void shootWhileMoveCalcsSimple(Pose currentPose) { // short for calculator
         double temp_time = elapsedtime.milliseconds();
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         double xVel = follower.getVelocity().getXComponent();
         double yVel = follower.getVelocity().getYComponent();
@@ -726,6 +834,9 @@ public class TwentyOneBallNear extends OpMode {
         double currentYDist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentPose.getY();
 
         double currentDist = Math.hypot(currentXDist, currentYDist);
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         telemetry.addLine("\n=== SHOOT WHILE MOVE CALCS ===");
 
@@ -738,6 +849,9 @@ public class TwentyOneBallNear extends OpMode {
             telemetry.addLine("0");
         }
         else {
+            ///  NO S3  NO S3  NO S3  NO S3  NO S3
+            ///  NO S3  NO S3  NO S3  NO S3  NO S3
+            ///  NO S3  NO S3  NO S3  NO S3  NO S3
             double airtime = -0.000012 * Math.pow(currentDist, 2) + 0.0036 * currentDist + 0.43;
             double adjustedXDist = currentXDist - (xVel * airtime);
             double adjustedYDist = currentYDist - (yVel * airtime);
@@ -749,6 +863,9 @@ public class TwentyOneBallNear extends OpMode {
             telemetry.addData("adjustedXDist", adjustedXDist);
             telemetry.addData("adjustedYDist", adjustedYDist);
         }
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
+        ///  NO S3  NO S3  NO S3  NO S3  NO S3
 
         telemetry.addData("xVel", xVel);
         telemetry.addData("yVel", yVel);

@@ -265,21 +265,25 @@ public class Shooter {
 //        opmode.telemetry.addData("calculated RPM", distanceToRPM(dist));
     }
 
-    public void operateAuto(double currentX, double currentY, boolean blueAlliance, boolean runShooter, boolean farZone) {
+    public void operateAuto(double currentX, double currentY, boolean blueAlliance, boolean runShooter, boolean farZone, boolean shutOff) {
         double currentRPM = getCurrentRPM();
         // calculate distance
         double x_dist = (blueAlliance ? Globals.blueGoalX : Globals.redGoalX) - currentX;
         double y_dist = (blueAlliance ? Globals.blueGoalY : Globals.redGoalY) - currentY;
         double dist = Math.hypot(x_dist, y_dist);
 
-        if (runShooter) {
-            targetRPM = distanceToRPM(dist);
-            targetHoodAngle = distanceToHoodAngle(dist);
-            hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
-        } else if (farZone) {
-            targetRPM = IDLE_FAR_RPM;
+        if (!shutOff) {
+            if (runShooter) {
+                targetRPM = distanceToRPM(dist);
+                targetHoodAngle = distanceToHoodAngle(dist);
+                hoodAngleAdjust.setPosition(targetAngleToServoPos(targetHoodAngle));
+            } else if (farZone) {
+                targetRPM = IDLE_FAR_RPM;
+            } else {
+                targetRPM = IDLE_NEAR_RPM;
+            }
         } else {
-            targetRPM = IDLE_NEAR_RPM;
+            targetRPM = 0;
         }
 
         output = update(currentRPM);

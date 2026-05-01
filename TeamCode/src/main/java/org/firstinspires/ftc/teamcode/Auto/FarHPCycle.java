@@ -68,7 +68,7 @@ public class FarHPCycle extends OpMode {
     private final Pose startPoseBlue        = new Pose(56.4,9, Math.toRadians(180));
     private final Pose scorePoseBlue        = new Pose(50.5, 12, Math.toRadians(180));
     private final Pose prepGrabS3PoseBlue   = new Pose(45, 33.5, Math.toRadians(180));
-    private final Pose grabS3PoseBlue       = new Pose(15, 35.5, Math.toRadians(180));
+    private final Pose grabS3PoseBlue       = new Pose(13, 35.5, Math.toRadians(180));
     private final Pose hpPrepPoseBlueCorner = new Pose(18.5, 8, Math.toRadians(180));
     private final Pose hpGrabPoseBlueCorner = new Pose(11.5, 8, Math.toRadians(180));
     private final Pose hpPrepPoseBlueMiddle = new Pose(18.5, 16, Math.toRadians(180));
@@ -76,7 +76,7 @@ public class FarHPCycle extends OpMode {
     private final Pose hpPrepPoseBlueHigh   = new Pose(14.5, 24, Math.toRadians(230));
     private final Pose hpGrabControlPoseBlueHigh = new Pose(11.5, 18.5, 0);
     private final Pose hpGrabPoseBlueHigh   = new Pose(9.5, 12.5, Math.toRadians(270));
-    private final Pose parkPoseBlue         = new Pose(49, 13, Math.toRadians(135));
+    private final Pose parkPoseBlue         = new Pose(47, 15, Math.toRadians(135));
 
     /// RED SIDE
     private final Pose startPoseRed        = new Pose(87.6, 9, Math.toRadians(0));
@@ -236,6 +236,10 @@ public class FarHPCycle extends OpMode {
                 runShooter = true;
                 runTurret = true;
                 openLatchAction();
+                Globals.blueGoalX = Globals.PERMANENT_blueGoalX;
+                Globals.blueGoalY = Globals.PERMANENT_blueGoalY;
+                Globals.redGoalX = 140;
+                Globals.redGoalY = 135;
                 follower.followPath(blueAlliance ? BScore123 : RScore123, true);
                 setPathState(1);
                 break;
@@ -309,7 +313,7 @@ public class FarHPCycle extends OpMode {
                 break;
             /// GRAB HIGH
             case 5:
-                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
+                if (!currentlyShooting && pathTimer.getElapsedTimeSeconds() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
 //                    shooter.closeLatch();
                     closeLatchAction();
@@ -395,8 +399,9 @@ public class FarHPCycle extends OpMode {
                         secondTimeComplete = true;
                         setPathState(8);
                     } else {
-                        /// back to grab high
+
                         secondTimeComplete = true;
+
                         setPathState(5);
                     }
                 }
@@ -462,14 +467,14 @@ public class FarHPCycle extends OpMode {
         }
 
         // toggles whether to grab spike 3
-        if (gamepad1.aWasPressed()) {
+        if (gamepad1.aWasPressed() || gamepad2.aWasPressed()) {
             grabS3 = !grabS3;
         }
         follower.update();
 
         telemetry.addLine("B for RED | X for BLUE");
         telemetry.addLine(blueAlliance ? "BLUE ALLIANCE" : "RED ALLIANCE");
-        telemetry.addData("\ngrabS3?", grabS3);
+        telemetry.addData("\ngrabS3? PRESS (A) TO TOGGLE", grabS3);
 
         telemetry.addData("\nx ", follower.getPose().getX());
         telemetry.addData("y ", follower.getPose().getY());
@@ -502,7 +507,7 @@ public class FarHPCycle extends OpMode {
         autonomousPathUpdate();
 
         intake.operateAuto(currentlyShooting);
-        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone);
+        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone, false);
         turret.operateAuto(currentPose.getX(), currentPose.getY(), Math.toDegrees(currentPose.getHeading()), blueAlliance, runTurret);
 
         // Feedback to Driver Hub for debugging

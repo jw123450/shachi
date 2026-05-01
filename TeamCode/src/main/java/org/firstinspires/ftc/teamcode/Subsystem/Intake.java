@@ -144,7 +144,7 @@ public class Intake {
         /// intake + transfer logic
         if (useManualIntake) {
             if (opmode.gamepad1.right_trigger > 0.2) {
-                if (transferFull && !continuousShot) { runIntakeOnly(); }
+                if (transferFull) { runIntakeOnly(); }
                 else { intakingIntake(); }
             } else if (opmode.gamepad1.yWasPressed() && intakeState != IntakeState.REVERSE) {
                 reverse();

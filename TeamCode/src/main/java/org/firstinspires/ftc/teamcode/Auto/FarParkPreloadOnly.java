@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.Util.RGBLights;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name = "Far Park Preload ONLY", group = "C", preselectTeleOp = "Full Teleop DUAL DRIVER")
+@Autonomous(name = "Far Park Preload ONLY", group = "B", preselectTeleOp = "Full Teleop DUAL DRIVER")
 public class FarParkPreloadOnly extends OpMode {
 
     private Follower follower;
@@ -55,6 +55,7 @@ public class FarParkPreloadOnly extends OpMode {
     private volatile boolean runTurret = false;
     private volatile boolean currentlyShooting = false;
     private boolean cyclingFarZone = true; // for shooter
+    private boolean shutOff = false;
 
     ///  CONSTANTS
     private final double TRANSFER_ONLY_DELAY = 0.03;
@@ -66,7 +67,7 @@ public class FarParkPreloadOnly extends OpMode {
     /// red start 90.6 9.8 0
     private final Pose startPoseBlue    = new Pose(56.4,9, Math.toRadians(180));
     private final Pose scorePoseBlue    = new Pose(50.5, 11.5, Math.toRadians(180));
-    private final Pose parkPoseBlue     = new Pose(49, 13, Math.toRadians(135));
+    private final Pose parkPoseBlue     = new Pose(65, 34, Math.toRadians(90));
 
     /// RED SIDE
     private final Pose startPoseRed = new Pose(90.6, 9.8, Math.toRadians(0));
@@ -109,14 +110,20 @@ public class FarParkPreloadOnly extends OpMode {
         switch (pathState) {
             ///  SPIN UP + SCOOCH
             case 0:
-                cyclingFarZone = true;
-                runShooter = true;
                 runTurret = true;
+                cyclingFarZone = true;
                 openLatchAction();
-                follower.followPath(blueAlliance ? BScore123 : RScore123, 0.5, true);
-                setPathState(1);
+                follower.followPath(blueAlliance ? BScore123 : RScore123, 0.7, true);
+                pathTimer.resetTimer();
+                setPathState(100);
                 break;
             /// SCORE PRELOAD (123)
+            case 100:
+                if (pathTimer.getElapsedTimeSeconds() > 11) {
+                    runShooter = true;
+                    setPathState(1);
+                }
+                break;
             case 1:
                 if (!follower.isBusy() && shooter.atTargetRPM && turret.atTargetAngle) {
                     currentlyShooting = true;
@@ -124,10 +131,26 @@ public class FarParkPreloadOnly extends OpMode {
                     setPathState(2);
                 }
                 break;
+//            case 101:
+//                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
+//                    shutOff = true;
+//                    runTurret = false;
+//                    runShooter = false;
+//                    setPathState(102);
+//                }
+//                break;
+//            case 102:
+//                if (pathTimer.getElapsedTimeSeconds() > 12) {
+//                    setPathState(2);
+//                }
+//                break;
             /// PARK
             case 2:
                 if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
+                    shutOff = true;
+                    runTurret = false;
+                    pathTimer.resetTimer();
                     follower.followPath(blueAlliance ? BPark : RPark, true);
                     setPathState(-1);
                 }
@@ -137,6 +160,7 @@ public class FarParkPreloadOnly extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false; // back to idle, will turn off when opmode stops
                     runTurret = false; // return to center
+
                     intake.idle();
                     intake.stowIntake();
                     shooter.closeLatch();
@@ -221,7 +245,7 @@ public class FarParkPreloadOnly extends OpMode {
         autonomousPathUpdate();
 
         intake.operateAuto(currentlyShooting);
-        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone);
+        shooter.operateAuto(currentPose.getX(), currentPose.getY(), blueAlliance, runShooter, cyclingFarZone, shutOff);
         turret.operateAuto(currentPose.getX(), currentPose.getY(), Math.toDegrees(currentPose.getHeading()), blueAlliance, runTurret);
 
         // Feedback to Driver Hub for debugging
@@ -229,6 +253,8 @@ public class FarParkPreloadOnly extends OpMode {
         telemetry.addData("path state ", pathState);
         telemetry.addData("runShooter? ", runShooter);
         telemetry.addData("runTurret? ", runTurret);
+        telemetry.addData("pathTimer millis", pathTimer.getElapsedTime());
+        telemetry.addData("pathTimer sec", pathTimer.getElapsedTimeSeconds());
         telemetry.addLine("\n");
         telemetry.addLine("PEDRO TELEMETRY");
         telemetry.addData("isBusy? ", follower.isBusy());
