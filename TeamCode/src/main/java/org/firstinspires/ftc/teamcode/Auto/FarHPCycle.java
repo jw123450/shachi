@@ -71,8 +71,8 @@ public class FarHPCycle extends OpMode {
     private final Pose grabS3PoseBlue       = new Pose(13, 35.5, Math.toRadians(180));
     private final Pose hpPrepPoseBlueCorner = new Pose(18.5, 8, Math.toRadians(180));
     private final Pose hpGrabPoseBlueCorner = new Pose(11.5, 8, Math.toRadians(180));
-    private final Pose hpPrepPoseBlueMiddle = new Pose(18.5, 16, Math.toRadians(180));
-    private final Pose hpGrabPoseBlueMiddle = new Pose(13.5, 16, Math.toRadians(180));
+    private final Pose hpPrepPoseBlueMiddle = new Pose(18.5, 20, Math.toRadians(180)); // 16
+    private final Pose hpGrabPoseBlueMiddle = new Pose(13.5, 20, Math.toRadians(180)); // 16
     private final Pose hpPrepPoseBlueHigh   = new Pose(14.5, 24, Math.toRadians(230));
     private final Pose hpGrabControlPoseBlueHigh = new Pose(11.5, 18.5, 0);
     private final Pose hpGrabPoseBlueHigh   = new Pose(9.5, 12.5, Math.toRadians(270));
@@ -313,7 +313,7 @@ public class FarHPCycle extends OpMode {
                 break;
             /// GRAB HIGH
             case 5:
-                if (!currentlyShooting && pathTimer.getElapsedTimeSeconds() > DELAY_BEFORE_MOVING) {
+                if (!currentlyShooting && pathTimer.getElapsedTime() > DELAY_BEFORE_MOVING) {
                     runShooter = false;
 //                    shooter.closeLatch();
                     closeLatchAction();

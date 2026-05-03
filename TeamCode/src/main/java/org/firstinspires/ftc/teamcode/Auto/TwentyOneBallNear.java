@@ -79,10 +79,10 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose grab789PoseBlue  = /** BLUE BLUE */new Pose(14.8, 59.45, Math.toRadians(148)); /// gate
     ///                                                               15.7
 
-    private final Pose grab789PoseRed   = /** RED RED */new Pose(131.6, 59.45, Math.toRadians(32)); /// gate
+    private final Pose grab789PoseRed   = /** RED RED */new Pose(131, 60.35, Math.toRadians(32)); /// gate
     ///                                                             130.7
 
-    private final Pose score789PoseBlue = new Pose(61.2,70.6, Math.toRadians(170));
+    private final Pose score789PoseBlue = new Pose(63.2,70.6, Math.toRadians(170));
     private final Pose grab101112PoseBlue  = grab789PoseBlue;
     private final Pose score101112PoseBlue = score789PoseBlue;
     private final Pose grab131415PoseBlue  = grab789PoseBlue;
@@ -105,7 +105,7 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose score456PoseRed  = score456PoseBlue.mirror();
 
 
-    private final Pose score789PoseRed  = score789PoseBlue.mirror();
+    private final Pose score789PoseRed  = new Pose(82,70.6, Math.toRadians(10));
     private final Pose grab101112PoseRed  = grab789PoseRed;
     private final Pose score101112PoseRed = score789PoseRed;
     private final Pose grab131415PoseRed  = grab789PoseRed;
@@ -118,7 +118,7 @@ public class TwentyOneBallNear extends OpMode {
     private final Pose score161718PoseRed = score161718PoseBlue.mirror();
     private final Pose grab192021PoseRed  = grab192021PoseBlue.mirror();
     private final Pose score192021PoseRed = score192021PoseBlue.mirror();
-    private final Pose parkPoseRed        = parkPoseBlue.mirror();
+    private final Pose parkPoseRed        = new Pose(100,81.5, Math.toRadians(315));;
 
     // PathChains
     private PathChain BScore123, BGrab456, BScore456, BGrab789, BScore789;
